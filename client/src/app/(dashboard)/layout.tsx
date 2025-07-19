@@ -1,6 +1,5 @@
 import Sidebar from "@/components/layout/sidebar";
 import MobileNavbar from "@/components/layout/mobile-navbar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 type Props = {
   children: React.ReactNode;
@@ -17,7 +16,6 @@ const DashboardLayout = async (props: Props) => {
 
       {/* Main Content */}
       <div className="bg-secondary flex flex-1 flex-col">
-        <ThemeToggle className="absolute top-8 right-8" />
         <main className="flex-1 overflow-y-auto pt-16 lg:ml-64 lg:pt-0">
           {props.children}
         </main>
