@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { syncUserToDatabase } from "@/server/services/user";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const accessToken = searchParams.get("access_token");
     const idToken = searchParams.get("id_token");
-    const state = searchParams.get("state");
 
     if (!accessToken || !idToken) {
       return NextResponse.redirect(
@@ -52,6 +52,21 @@ export async function GET(req: NextRequest) {
       idToken: idToken,
       createdAt: Date.now(),
     };
+
+    // Sync user to database immediately after creating session
+    try {
+      await syncUserToDatabase({
+        sub: userData.sub,
+        name: userData.name,
+        email: userData.email,
+        picture: userData.picture,
+      });
+      console.log("User synced to database successfully");
+    } catch (syncError) {
+      console.error("Failed to sync user to database:", syncError);
+      // Don't fail the login process if database sync fails
+      // The user can still use the app, and we can retry sync later
+    }
 
     const response = NextResponse.redirect(new URL("/", req.url));
 

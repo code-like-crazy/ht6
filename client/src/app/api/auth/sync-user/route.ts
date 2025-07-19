@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
+import { NextResponse } from "next/server";
+import { getCustomSession } from "@/lib/custom-session";
 import { syncUserToDatabase } from "@/server/services/user";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
-    // Get the current user session
-    const session = await auth0.getSession();
+    // Get the current user session from custom session
+    const session = await getCustomSession();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
