@@ -1,0 +1,111 @@
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Building2, Users, FolderOpen, MoreHorizontal } from "lucide-react";
+
+type Organization = {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  role: string;
+  createdAt: Date;
+};
+
+type OrganizationCardProps = {
+  organization: Organization;
+  projectCount?: number;
+  memberCount?: number;
+  onSelect?: (organization: Organization) => void;
+};
+
+const OrganizationCard = ({
+  organization,
+  projectCount = 0,
+  memberCount = 1,
+  onSelect,
+}: OrganizationCardProps) => {
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case "owner":
+        return "bg-primary/10 text-primary border-primary/20";
+      case "manager":
+        return "bg-accent/10 text-accent border-accent/20";
+      default:
+        return "bg-muted text-muted-foreground border-border";
+    }
+  };
+
+  return (
+    <Card className="border-border group hover:border-primary/20 cursor-pointer p-6 shadow-sm transition-all hover:shadow-md">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+            {organization.imageUrl ? (
+              <img
+                src={organization.imageUrl}
+                alt={organization.name}
+                className="h-12 w-12 rounded-lg object-cover"
+              />
+            ) : (
+              <Building2 className="text-primary h-6 w-6" />
+            )}
+          </div>
+          <div className="flex-1">
+            <h3 className="text-foreground group-hover:text-primary font-serif text-lg font-semibold transition-colors">
+              {organization.name}
+            </h3>
+            {organization.description && (
+              <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                {organization.description}
+              </p>
+            )}
+            <div className="text-muted-foreground mt-2 flex items-center space-x-4 text-sm">
+              <div className="flex items-center space-x-1">
+                <FolderOpen className="h-4 w-4" />
+                <span>{projectCount} projects</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <Users className="h-4 w-4" />
+                <span>{memberCount} members</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span
+            className={`rounded-full border px-2 py-1 text-xs font-medium ${getRoleBadgeColor(
+              organization.role,
+            )}`}
+          >
+            {organization.role}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="opacity-0 transition-opacity group-hover:opacity-100"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between">
+        <p className="text-muted-foreground text-xs">
+          Created {organization.createdAt.toLocaleDateString()}
+        </p>
+        <Button
+          onClick={() => onSelect?.(organization)}
+          variant="outline"
+          size="sm"
+          className="opacity-0 transition-opacity group-hover:opacity-100"
+        >
+          Open Dashboard
+        </Button>
+      </div>
+    </Card>
+  );
+};
+
+export default OrganizationCard;
