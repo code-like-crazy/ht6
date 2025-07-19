@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, Users, FolderOpen, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
+import * as LucideIcons from "lucide-react";
 
 type Organization = {
   id: number;
@@ -9,6 +10,7 @@ type Organization = {
   slug: string;
   description?: string | null;
   imageUrl?: string | null;
+  icon?: string | null;
   role: string;
   createdAt: Date;
 };
@@ -37,6 +39,34 @@ const OrganizationCard = ({
     }
   };
 
+  const getIconComponent = (iconName?: string | null) => {
+    if (!iconName) return Building2;
+
+    // Convert icon name to PascalCase if needed
+    const formattedIconName =
+      iconName.charAt(0).toUpperCase() + iconName.slice(1);
+
+    // Try to get the icon component from lucide-react
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const lucideIcons = LucideIcons as any;
+      const IconComponent =
+        lucideIcons[formattedIconName] || lucideIcons[iconName];
+
+      // Check if it's a valid React component
+      if (typeof IconComponent === "function") {
+        return IconComponent;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      console.warn(`Icon "${iconName}" not found in lucide-react`);
+    }
+
+    return Building2;
+  };
+
+  const IconComponent = getIconComponent(organization.icon);
+
   return (
     <Card className="border-border group hover:border-primary/20 cursor-pointer p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
       {/* Mobile Layout */}
@@ -53,7 +83,7 @@ const OrganizationCard = ({
                   className="h-10 w-10 rounded-lg object-cover"
                 />
               ) : (
-                <Building2 className="text-primary h-4 w-4" />
+                <IconComponent className="text-primary h-4 w-4" />
               )}
             </div>
             <div className="min-w-0 flex-1">
@@ -126,7 +156,7 @@ const OrganizationCard = ({
                   className="h-12 w-12 rounded-lg object-cover"
                 />
               ) : (
-                <Building2 className="text-primary h-6 w-6" />
+                <IconComponent className="text-primary h-6 w-6" />
               )}
             </div>
             <div className="min-w-0 flex-1">
