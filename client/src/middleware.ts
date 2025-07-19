@@ -6,7 +6,19 @@ import { auth0 } from "./lib/auth0"; // Adjust path if your auth0 client is else
 export async function middleware(request: NextRequest) {
   // Skip Auth0 middleware for custom login/callback routes to avoid JWE issues
   if (request.nextUrl.pathname.startsWith("/api/auth/custom-")) {
-    return;
+    return NextResponse.next();
+  }
+
+  // Skip middleware for theme-related requests and static assets
+  if (
+    request.nextUrl.pathname.startsWith("/_next/") ||
+    request.nextUrl.pathname.includes("/favicon.ico") ||
+    request.nextUrl.pathname.includes("/sitemap.xml") ||
+    request.nextUrl.pathname.includes("/robots.txt") ||
+    request.headers.get("sec-fetch-dest") === "script" ||
+    request.headers.get("sec-fetch-dest") === "style"
+  ) {
+    return NextResponse.next();
   }
 
   // Check if we have a custom session cookie
