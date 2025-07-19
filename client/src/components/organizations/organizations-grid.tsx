@@ -8,6 +8,7 @@ type Organization = {
   slug: string;
   description?: string | null;
   imageUrl?: string | null;
+  icon?: string | null;
   role: string;
   createdAt: Date;
 };
