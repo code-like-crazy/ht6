@@ -12,10 +12,7 @@ export default async function Home() {
           <h1 className="mb-8 text-2xl font-bold">HT6 Auth Test</h1>
           <div className="space-x-4">
             <Button asChild>
-              <a href="/auth/login?screen_hint=signup">Sign up</a>
-            </Button>
-            <Button variant="outline" asChild>
-              <a href="/auth/login">Log in</a>
+              <a href="/login">Get Started</a>
             </Button>
           </div>
         </div>
