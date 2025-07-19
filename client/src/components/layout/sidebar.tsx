@@ -2,6 +2,7 @@ import SidebarLogo from "./sidebar-logo";
 import SidebarNavigation from "./sidebar-navigation";
 import SidebarQuickActions from "./sidebar-quick-actions";
 import SidebarUserProfile from "./sidebar-user-profile";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Sidebar = () => {
   return (
@@ -12,6 +13,11 @@ const Sidebar = () => {
       {/* Navigation Section */}
       <div className="flex flex-1 flex-col">
         <SidebarNavigation />
+
+        {/* Theme Toggle */}
+        <div className="ml-auto px-4 pb-4">
+          <ThemeToggle />
+        </div>
 
         {/* Quick Actions Section */}
         <SidebarQuickActions />

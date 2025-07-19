@@ -24,6 +24,7 @@ export const organizationsTable = pgTable("organizations", {
   slug: varchar({ length: 255 }).notNull().unique(),
   description: text(),
   imageUrl: varchar({ length: 255 }),
+  icon: varchar({ length: 50 }), // Store the icon name
   createdById: integer()
     .notNull()
     .references(() => usersTable.id),
