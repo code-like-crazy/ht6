@@ -19,6 +19,7 @@ import {
   Building2,
 } from "lucide-react";
 import { useUser } from "@/components/providers/user-provider";
+import Image from "next/image";
 
 const MobileNavbar = () => {
   const { user, isLoading } = useUser();
@@ -72,13 +73,16 @@ const MobileNavbar = () => {
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="top" className="h-screen p-6">
+        <SheetContent
+          side="top"
+          className="flex h-svh flex-col justify-between p-6"
+        >
           <SheetHeader className="pb-6">
-            <SheetTitle className="text-left text-xl">Navigation</SheetTitle>
+            <SheetTitle className="text-left text-xl">ProjectName</SheetTitle>
           </SheetHeader>
 
           {/* Navigation Items */}
-          <nav className="space-y-3 py-4">
+          <nav className="max-h-[50vh] space-y-3 overflow-y-auto py-4">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -123,10 +127,11 @@ const MobileNavbar = () => {
             ) : user ? (
               <div className="flex items-center space-x-3">
                 {user.imageUrl ? (
-                  <img
+                  <Image
                     src={user.imageUrl}
                     alt={user.name}
                     className="h-8 w-8 rounded-full object-cover"
+                    width={32}
                   />
                 ) : (
                   <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-full">

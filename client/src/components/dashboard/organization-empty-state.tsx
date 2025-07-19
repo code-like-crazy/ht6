@@ -4,8 +4,8 @@ import Link from "next/link";
 
 const OrganizationEmptyState = () => {
   return (
-    <div className="flex h-svh w-full items-center justify-center p-2 sm:p-4">
-      <div className="border-border/60 bg-background flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed">
+    <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:h-svh">
+      <div className="border-border/60 bg-background flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed py-6">
         <div className="max-w-4xl px-4 text-center">
           <div className="bg-primary/10 mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-full sm:mb-8 sm:h-16 sm:w-16">
             <Building2 className="text-primary h-6 w-6 sm:h-8 sm:w-8" />
