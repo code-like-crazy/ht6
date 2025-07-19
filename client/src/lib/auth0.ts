@@ -1,3 +1,8 @@
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { getCustomSession } from "./custom-session";
 
-export const auth0 = new Auth0Client();
+// Use our custom session system that integrates with Auth0
+export const auth0 = {
+  async getSession() {
+    return await getCustomSession();
+  },
+};

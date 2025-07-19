@@ -1,8 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { auth0 } from "./lib/auth0"; // Adjust path if your auth0 client is elsewhere
-
 export async function middleware(request: NextRequest) {
   // Skip Auth0 middleware for custom login/callback routes to avoid JWE issues
   if (request.nextUrl.pathname.startsWith("/api/auth/custom-")) {
@@ -36,7 +34,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return await auth0.middleware(request);
+  // Since we're using custom sessions, just continue with the request
+  return NextResponse.next();
 }
 
 export const config = {
