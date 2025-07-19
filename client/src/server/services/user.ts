@@ -107,3 +107,16 @@ export async function getUserById(id: number) {
 
   return user || null;
 }
+
+export async function updateUserName(auth0Id: string, name: string) {
+  const [updatedUser] = await db
+    .update(usersTable)
+    .set({
+      name: name.trim(),
+      updatedAt: new Date(),
+    })
+    .where(eq(usersTable.auth0Id, auth0Id))
+    .returning();
+
+  return updatedUser || null;
+}
