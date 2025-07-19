@@ -3,7 +3,6 @@ import { db } from "@/server/db";
 import {
   organizationsTable,
   organizationMembersTable,
-  usersTable,
 } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
 
@@ -15,6 +14,7 @@ export async function getUserOrganizations(userId: number) {
       slug: organizationsTable.slug,
       description: organizationsTable.description,
       imageUrl: organizationsTable.imageUrl,
+      icon: organizationsTable.icon,
       role: organizationMembersTable.role,
       createdAt: organizationsTable.createdAt,
     })
@@ -62,6 +62,7 @@ export async function createOrganization(data: {
   name: string;
   slug: string;
   description?: string;
+  icon?: string;
   createdById: number;
 }) {
   const [organization] = await db

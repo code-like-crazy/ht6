@@ -2,7 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Building2, Plus, Users, ArrowRight, UserPlus } from "lucide-react";
 import Link from "next/link";
 
-const OrganizationEmptyState = () => {
+type OrganizationEmptyStateProps = {
+  onCreateClick?: () => void;
+  onJoinClick?: () => void;
+};
+
+const OrganizationEmptyState = ({
+  onCreateClick,
+  onJoinClick,
+}: OrganizationEmptyStateProps = {}) => {
   return (
     <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:h-svh">
       <div className="border-border/60 bg-background flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed py-6">
@@ -60,24 +68,47 @@ const OrganizationEmptyState = () => {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <Button size="default" className="px-6 py-2 text-sm" asChild>
-              <Link href="/organization/create">
+            {onCreateClick ? (
+              <Button
+                size="default"
+                className="px-6 py-2 text-sm"
+                onClick={onCreateClick}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Create Organization
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button size="default" className="px-6 py-2 text-sm" asChild>
+                <Link href="/organizations">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Organization
+                </Link>
+              </Button>
+            )}
 
-            <Button
-              variant="outline"
-              size="default"
-              className="px-6 py-2 text-sm"
-              asChild
-            >
-              <Link href="/organization/join">
+            {onJoinClick ? (
+              <Button
+                variant="outline"
+                size="default"
+                className="px-6 py-2 text-sm"
+                onClick={onJoinClick}
+              >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Join Organization
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="default"
+                className="px-6 py-2 text-sm"
+                asChild
+              >
+                <Link href="/organization/join">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Join Organization
+                </Link>
+              </Button>
+            )}
           </div>
 
           <div className="border-border/40 mt-8 border-t pt-6">
