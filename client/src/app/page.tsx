@@ -86,6 +86,9 @@ export default async function Home() {
 
   return (
     <main className="flex min-h-screen items-center justify-center">
+      <Button asChild>
+        <a href="/api/auth/clear-cookies">Clear Cookies & Try Again</a>
+      </Button>
       <div className="text-center">
         <h1 className="mb-8 text-2xl font-bold">Welcome!</h1>
         <div className="mb-6 max-w-md rounded-lg bg-gray-50 p-6 text-left">
