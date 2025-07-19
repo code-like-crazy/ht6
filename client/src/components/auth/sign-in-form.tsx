@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Form,
@@ -57,7 +56,7 @@ export function SignInForm({ onToggleMode }: SignInFormProps) {
           throw new Error(result.error || "Authentication failed");
         }
 
-        // Redirect to callback URL or home
+        // Redirect to Auth0 with email pre-filled
         window.location.href = result.redirectUrl || "/";
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");

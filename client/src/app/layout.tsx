@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 const oxanium = Oxanium({
   variable: "--font-oxanium",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {

@@ -1,11 +1,36 @@
 import { auth0 } from "@/lib/auth0";
 import { Button } from "@/components/ui/button";
 import { syncUserToDatabase } from "@/server/services/user";
+import { getCustomSession } from "@/lib/custom-session";
 
 export default async function Home() {
-  const session = await auth0.getSession();
+  // Try to get Auth0 session first, but handle JWE errors gracefully
+  let session = null;
+  try {
+    session = await auth0.getSession();
+  } catch (error) {
+    // If there's a JWE error, it means there's an invalid session cookie
+    // We'll ignore it and try custom session instead
+    console.log(
+      "Auth0 session error (likely invalid JWE), trying custom session",
+    );
+  }
 
+  let isCustomSession = false;
+  let user = null;
+
+  // If no Auth0 session, try custom session
   if (!session) {
+    const customSession = await getCustomSession();
+    if (customSession) {
+      user = customSession.user;
+      isCustomSession = true;
+    }
+  } else {
+    user = session.user;
+  }
+
+  if (!user) {
     return (
       <main className="flex min-h-screen items-center justify-center">
         <div className="text-center">
@@ -21,36 +46,74 @@ export default async function Home() {
   }
 
   // Automatically sync user to database when they visit the page
-  const dbUser = await syncUserToDatabase({
-    sub: session.user.sub,
-    name: session.user.name,
-    email: session.user.email,
-    picture: session.user.picture,
-  });
+  let dbUser;
+  try {
+    console.log("Syncing user to database:", {
+      sub: user.sub,
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+    });
+
+    dbUser = await syncUserToDatabase({
+      sub: user.sub,
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+    });
+  } catch (error) {
+    console.error("Failed to sync user to database:", error);
+    console.error("User data:", user);
+
+    // Return error page instead of crashing
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="mb-8 text-2xl font-bold text-red-600">
+            Database Error
+          </h1>
+          <p className="mb-4">Failed to sync user to database.</p>
+          <p className="mb-4 text-sm text-gray-600">
+            User ID: {user.sub || "missing"}
+          </p>
+          <Button asChild>
+            <a href="/api/auth/clear-cookies">Clear Cookies & Try Again</a>
+          </Button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center">
       <div className="text-center">
         <h1 className="mb-8 text-2xl font-bold">Welcome!</h1>
         <div className="mb-6 max-w-md rounded-lg bg-gray-50 p-6 text-left">
-          <h2 className="mb-4 font-semibold">Auth0 User Info:</h2>
+          <h2 className="mb-4 font-semibold">
+            {isCustomSession ? "Custom Session" : "Auth0 Session"} User Info:
+          </h2>
           <p>
-            <strong>Name:</strong> {session.user.name}
+            <strong>Name:</strong> {user.name}
           </p>
           <p>
-            <strong>Email:</strong> {session.user.email}
+            <strong>Email:</strong> {user.email}
           </p>
           <p>
-            <strong>Auth0 ID:</strong> {session.user.sub}
+            <strong>Auth0 ID:</strong> {user.sub}
           </p>
-          {session.user.picture && (
+          {user.picture && (
             <div className="mt-4">
               <img
-                src={session.user.picture}
+                src={user.picture}
                 alt="Profile"
                 className="h-16 w-16 rounded-full"
               />
             </div>
+          )}
+          {isCustomSession && (
+            <p className="mt-2 text-sm text-green-600">
+              ✅ Logged in via custom form
+            </p>
           )}
         </div>
 
@@ -77,7 +140,11 @@ export default async function Home() {
         </div>
 
         <Button asChild>
-          <a href="/auth/logout">Log out</a>
+          <a
+            href={isCustomSession ? "/api/auth/custom-logout" : "/auth/logout"}
+          >
+            Log out
+          </a>
         </Button>
       </div>
     </main>
