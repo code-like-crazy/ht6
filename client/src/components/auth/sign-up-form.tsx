@@ -52,6 +52,7 @@ export function SignUpForm({ onToggleMode }: SignUpFormProps) {
         });
 
         const result = await response.json();
+        console.log("SignUp Response:", result);
 
         if (!response.ok) {
           throw new Error(result.error || "Registration failed");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OrganizationsHeader from "@/components/organizations/organizations-header";
 import OrganizationEmptyState from "@/components/dashboard/organization-empty-state";
 import OrganizationsGrid from "@/components/organizations/organizations-grid";
@@ -30,6 +30,22 @@ const OrganizationsClient = ({ organizations }: OrganizationsClientProps) => {
     // TODO: Navigate to organization dashboard
     console.log("Selected organization:", organization);
   };
+
+  // GitHub API
+  useEffect(() => {
+    const fetchGitHubData = async () => {
+      try {
+        // Replace with user's repository details
+        const res = await fetch("/api/integrations/github?owner=vercel&repo=next.js");
+        const json = await res.json();
+        console.log("Fetched GitHub data:", json);
+      } catch (err) {
+        console.error("Error fetching GitHub data:", err);
+      }
+    };
+
+    fetchGitHubData();
+  }, []);
 
   return (
     <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:h-svh">
