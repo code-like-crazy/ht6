@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -52,6 +53,13 @@ export default function Home() {
           </a>
         </div>
       </main>
+      <Button>Test Default</Button>
+      <Button className="" variant="secondary">
+        Test Secondary
+      </Button>
+      <Button variant="outline">Test Accent</Button>
+      <Button variant="destructive">Test Destructive</Button>
+      <Button variant="ghost">Test Ghost</Button>
       <footer className="row-start-3 flex flex-wrap items-center justify-center gap-[24px]">
         <Link
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
