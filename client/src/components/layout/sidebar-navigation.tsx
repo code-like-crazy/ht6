@@ -2,43 +2,15 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Settings, Users, FolderOpen } from "lucide-react";
+import { navLinks } from "@/config/site";
 
 const SidebarNavigation = () => {
   const pathname = usePathname();
 
-  const navigationItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: Home,
-    },
-    {
-      name: "Organizations",
-      href: "/organizations",
-      icon: FolderOpen,
-    },
-    {
-      name: "Projects",
-      href: "/projects",
-      icon: FolderOpen,
-    },
-    {
-      name: "Team",
-      href: "/team",
-      icon: Users,
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: Settings,
-    },
-  ];
-
   return (
     <nav className="flex-1 px-4 py-6">
       <div className="space-y-1">
-        {navigationItems.map((item) => {
+        {navLinks.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
 

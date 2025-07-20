@@ -1,51 +1,18 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Home, Settings, Users, FolderOpen, Plus, Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Plus, Menu } from "lucide-react";
 import { useUser } from "@/components/providers/user-provider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { navLinks } from "@/config/site";
 
 const MobileNavbar = () => {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
-
-  const navigationItems = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: Home,
-    },
-    {
-      name: "Organizations",
-      href: "/organizations",
-      icon: FolderOpen,
-    },
-    {
-      name: "Projects",
-      href: "/projects",
-      icon: FolderOpen,
-    },
-    {
-      name: "Team",
-      href: "/team",
-      icon: Users,
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: Settings,
-    },
-  ];
 
   return (
     <div className="bg-background border-border fixed top-0 right-0 left-0 z-50 flex h-16 items-center justify-between border-b px-4 lg:hidden">
@@ -86,7 +53,7 @@ const MobileNavbar = () => {
             {/* Navigation Items */}
             <nav className="flex-1 px-4 py-6">
               <div className="space-y-1">
-                {navigationItems.map((item) => {
+                {navLinks.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
 
