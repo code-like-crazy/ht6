@@ -53,7 +53,7 @@ export default function MemberCard({ member, currentUser }: MemberCardProps) {
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-lg border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
+      className={`group relative overflow-hidden rounded-lg border p-4 py-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
         isCurrentUser
           ? "bg-primary/5 border-primary/20 shadow-sm"
           : "bg-background/50 border-border hover:border-primary/30"

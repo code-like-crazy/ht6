@@ -1,35 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth0 } from "@/lib/auth0";
-import { updateUserName } from "@/server/services/user";
+import { updateUserNameByEmail } from "@/server/services/user";
 import { z } from "zod";
 
 const updateNameSchema = z.object({
+  email: z.string().email("Valid email is required"),
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
 });
 
 export async function PATCH(request: NextRequest) {
   try {
-    // Get the current user session
-    const session = await auth0.getSession();
-
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     // Parse and validate the request body
     const body = await request.json();
     const validatedData = updateNameSchema.parse(body);
 
-    // Update the user's name in the database
-    const updatedUser = await updateUserName(
-      session.user.sub,
+    // Update the user's name in the database by email
+    const updatedUser = await updateUserNameByEmail(
+      validatedData.email,
       validatedData.name,
     );
 
     if (!updatedUser) {
       return NextResponse.json(
-        { error: "Failed to update user name" },
-        { status: 500 },
+        { error: "User not found or failed to update user name" },
+        { status: 404 },
       );
     }
 

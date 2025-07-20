@@ -120,3 +120,16 @@ export async function updateUserName(auth0Id: string, name: string) {
 
   return updatedUser || null;
 }
+
+export async function updateUserNameByEmail(email: string, name: string) {
+  const [updatedUser] = await db
+    .update(usersTable)
+    .set({
+      name: name.trim(),
+      updatedAt: new Date(),
+    })
+    .where(eq(usersTable.email, email))
+    .returning();
+
+  return updatedUser || null;
+}

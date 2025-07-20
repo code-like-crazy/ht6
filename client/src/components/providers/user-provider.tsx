@@ -42,18 +42,13 @@ export const UserProvider = ({ children, initialUser }: UserProviderProps) => {
   useEffect(() => {
     if (!initialUser) {
       // Fetch user data from API if not provided
-      fetch("/api/auth/sync-user", {
-        method: "POST",
-      })
+      fetch("/api/user/me")
         .then(async (res) => {
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
           }
-          const text = await res.text();
-          if (!text) {
-            throw new Error("Empty response");
-          }
-          return JSON.parse(text);
+          const data = await res.json();
+          return data;
         })
         .then((data) => {
           if (data.user) {
