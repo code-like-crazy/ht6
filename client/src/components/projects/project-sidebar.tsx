@@ -38,13 +38,7 @@ export default function ProjectSidebar({
   const renderTabContent = () => {
     switch (activeTab) {
       case "integrations":
-        return (
-          <IntegrationsTab
-            isDemo={isDemo}
-            projectId={project.id}
-            onAddIntegration={() => console.log("Add integration")}
-          />
-        );
+        return <IntegrationsTab isDemo={isDemo} projectId={project.id} />;
       case "knowledge":
         return <KnowledgeTab isDemo={isDemo} projectId={project.id} />;
       case "links":

@@ -1,13 +1,28 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Plug } from "lucide-react";
+import { Plus, Plug, Settings, Github } from "lucide-react";
 import {
   availableIntegrations,
-  mockConnectedIntegrations,
   integrationStatuses,
 } from "@/config/integrations";
 import { useIntegrationModal } from "@/components/providers/integration-modal-provider";
+import GitHubRepositoryModal from "@/components/projects/github-repository-modal";
+
+interface Connection {
+  id: number;
+  type: string;
+  name: string;
+  settings: {
+    repositories?: Array<{ id: number; name: string; full_name: string }>;
+    sync_enabled?: boolean;
+    last_sync?: string | null;
+  };
+  isActive: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface IntegrationsTabProps {
   isDemo?: boolean;
@@ -15,28 +30,98 @@ interface IntegrationsTabProps {
 }
 
 export default function IntegrationsTab({
-  isDemo = true,
+  isDemo = false,
   projectId,
 }: IntegrationsTabProps) {
   const { openIntegrationModal } = useIntegrationModal();
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [githubRepoModalOpen, setGithubRepoModalOpen] = useState(false);
+  const [selectedGithubConnection, setSelectedGithubConnection] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
+  // Fetch connections when component mounts or projectId changes
+  useEffect(() => {
+    if (projectId && !isDemo) {
+      fetchConnections();
+    }
+  }, [projectId, isDemo]);
+
+  const fetchConnections = async () => {
+    if (!projectId) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `/api/integrations/connections?projectId=${projectId}`,
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setConnections(data.connections);
+      }
+    } catch (error) {
+      console.error("Error fetching connections:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAddIntegration = () => {
     if (projectId) {
       openIntegrationModal(projectId);
     }
   };
-  // TODO: Replace with actual data fetching when isDemo is false
-  const connectedIntegrations = isDemo
-    ? mockConnectedIntegrations.map((connected) => {
-        const integration = availableIntegrations.find(
-          (int) => int.id === connected.id,
-        );
-        return {
-          ...integration!,
-          ...connected,
-        };
-      })
-    : []; // In real implementation, fetch from database using projectId
+
+  const handleConfigureIntegration = (connection: Connection) => {
+    if (connection.type === "github") {
+      setSelectedGithubConnection({
+        id: connection.id,
+        name: connection.name,
+      });
+      setGithubRepoModalOpen(true);
+    }
+  };
+
+  const connectedIntegrations = connections
+    .map((connection) => {
+      const integration = availableIntegrations.find(
+        (int) => int.id === connection.type,
+      );
+
+      if (!integration) return null;
+
+      // Determine status based on connection data
+      let status: keyof typeof integrationStatuses = "connected";
+      let syncedItems = 0;
+      let lastSync = "Never";
+
+      if (connection.type === "github" && connection.settings) {
+        syncedItems = connection.settings.repositories?.length || 0;
+        if (connection.settings.last_sync) {
+          lastSync = new Date(
+            connection.settings.last_sync,
+          ).toLocaleDateString();
+        }
+
+        if (syncedItems === 0) {
+          status = "disconnected";
+        }
+      }
+
+      return {
+        ...integration,
+        id: connection.id,
+        connectionType: connection.type,
+        status,
+        lastSync,
+        syncedItems,
+        dbConnection: connection,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -114,18 +199,45 @@ export default function IntegrationsTab({
               </div>
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <p className="text-muted-foreground text-xs">
-                Last sync: {integration.lastSync}
-              </p>
-              {integration.syncedItems > 0 && (
+              <div className="flex items-center gap-4">
                 <p className="text-muted-foreground text-xs">
-                  {integration.syncedItems.toLocaleString()} items
+                  Last sync: {integration.lastSync}
                 </p>
-              )}
+                {integration.syncedItems > 0 && (
+                  <p className="text-muted-foreground text-xs">
+                    {integration.syncedItems.toLocaleString()} items
+                  </p>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2"
+                onClick={() =>
+                  handleConfigureIntegration(integration.dbConnection)
+                }
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         );
       })}
+
+      {/* GitHub Repository Selection Modal */}
+      {selectedGithubConnection && projectId && (
+        <GitHubRepositoryModal
+          isOpen={githubRepoModalOpen}
+          onClose={() => {
+            setGithubRepoModalOpen(false);
+            setSelectedGithubConnection(null);
+            // Refresh connections after modal closes
+            fetchConnections();
+          }}
+          projectId={projectId}
+          connectionName={selectedGithubConnection.name}
+        />
+      )}
     </div>
   );
 }
