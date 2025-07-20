@@ -7,18 +7,24 @@ import {
   mockConnectedIntegrations,
   integrationStatuses,
 } from "@/config/integrations";
+import { useIntegrationModal } from "@/components/providers/integration-modal-provider";
 
 interface IntegrationsTabProps {
   isDemo?: boolean;
   projectId?: number;
-  onAddIntegration?: () => void;
 }
 
 export default function IntegrationsTab({
   isDemo = true,
   projectId,
-  onAddIntegration,
 }: IntegrationsTabProps) {
+  const { openIntegrationModal } = useIntegrationModal();
+
+  const handleAddIntegration = () => {
+    if (projectId) {
+      openIntegrationModal(projectId);
+    }
+  };
   // TODO: Replace with actual data fetching when isDemo is false
   const connectedIntegrations = isDemo
     ? mockConnectedIntegrations.map((connected) => {
@@ -48,7 +54,7 @@ export default function IntegrationsTab({
         variant="outline"
         size="sm"
         className="px-4 py-2"
-        onClick={onAddIntegration}
+        onClick={handleAddIntegration}
       >
         <Plus className="mr-2 h-4 w-4" />
         Connect First Tool
@@ -70,7 +76,7 @@ export default function IntegrationsTab({
           variant="outline"
           size="default"
           className="px-4 py-2"
-          onClick={onAddIntegration}
+          onClick={handleAddIntegration}
         >
           <Plus className="mr-2 h-4 w-4" />
           Add
