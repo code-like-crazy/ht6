@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
   const repo = req.nextUrl.searchParams.get("repo");
 
   if (!owner || !repo) {
-    return NextResponse.json({ error: "Missing owner or repo" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing owner or repo" },
+      { status: 400 },
+    );
   }
 
   const headers = {
@@ -31,7 +34,10 @@ export async function GET(req: NextRequest) {
 
   try {
     // Fetch Pull Requests
-    const prRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls?state=all&per_page=50`, { headers });
+    const prRes = await fetch(
+      `${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls?state=all&per_page=50`,
+      { headers },
+    );
     const prs = await prRes.json();
 
     if (Array.isArray(prs)) {
@@ -48,7 +54,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch Issues (excluding PRs)
-    const issueRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/issues?state=all&per_page=50`, { headers });
+    const issueRes = await fetch(
+      `${GITHUB_API_BASE}/repos/${owner}/${repo}/issues?state=all&per_page=50`,
+      { headers },
+    );
     const issues = await issueRes.json();
 
     if (Array.isArray(issues)) {
@@ -67,7 +76,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch Commits
-    const commitRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/commits?per_page=50`, { headers });
+    const commitRes = await fetch(
+      `${GITHUB_API_BASE}/repos/${owner}/${repo}/commits?per_page=50`,
+      { headers },
+    );
     const commits = await commitRes.json();
 
     if (Array.isArray(commits)) {
@@ -119,6 +131,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ data: results, files: files });
   } catch (error: any) {
     console.error("GitHub sync error:", error);
-    return NextResponse.json({ error: "Failed to fetch from GitHub" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch from GitHub" },
+      { status: 500 },
+    );
   }
 }
