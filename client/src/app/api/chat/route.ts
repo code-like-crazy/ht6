@@ -70,7 +70,7 @@ USER QUESTION: ${question}
 Please provide a comprehensive answer based on the available context.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-2.0-flash",
       contents: prompt,
     });
 

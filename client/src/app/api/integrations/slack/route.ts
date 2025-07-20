@@ -4,6 +4,10 @@ import { db } from "@/server/db";
 import { connectionsTable } from "@/server/db/schema";
 import { getCurrentUser } from "@/server/services/user";
 import { eq, and } from "drizzle-orm";
+import {
+  batchInsertEmbeddings,
+  ChunkInput,
+} from "@/server/services/embeddings-batch";
 
 interface SlackCredentials {
   access_token: string;
@@ -31,7 +35,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { projectId, selectedChannels } = await req.json();
+    const { projectId, selectedChannels: selectedChannelsFromBody } =
+      await req.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -71,7 +76,7 @@ export async function POST(req: NextRequest) {
     };
 
     // If selectedChannels is provided, save the channel selection
-    if (selectedChannels) {
+    if (selectedChannelsFromBody) {
       const currentSettings =
         (connection[0].settings as Record<string, unknown>) || {};
 
@@ -80,7 +85,7 @@ export async function POST(req: NextRequest) {
         .set({
           settings: {
             ...currentSettings,
-            selectedChannels,
+            selectedChannels: selectedChannelsFromBody,
             lastChannelUpdate: new Date().toISOString(),
           },
           updatedAt: new Date(),
@@ -89,36 +94,74 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: `Saved ${selectedChannels.length} selected channels`,
-        selectedChannels,
+        message: `Saved ${selectedChannelsFromBody.length} selected channels`,
+        selectedChannels: selectedChannelsFromBody,
       });
     }
 
     // Otherwise, perform a sync operation
     const slackClient = new WebClient(slackCredentials.access_token);
 
-    // Fetch channels
-    const channelsResponse = await slackClient.conversations.list({
-      types: "public_channel,private_channel",
-      limit: 100,
-    });
+    // Get selected channels from connection settings
+    const currentSettings =
+      (connection[0].settings as Record<string, unknown>) || {};
+    const selectedChannelsForSync: string[] =
+      (currentSettings.selectedChannels as string[]) || [];
 
-    if (!channelsResponse.ok) {
+    if (!selectedChannelsForSync.length) {
       return NextResponse.json(
-        { error: "Failed to fetch Slack channels" },
-        { status: 500 },
+        {
+          error:
+            "No selected Slack channels to sync. Please select channels first.",
+        },
+        { status: 400 },
       );
     }
 
-    const channels = channelsResponse.channels || [];
+    // Fetch messages from each selected channel
+    let totalMessages = 0;
+    const allChunks: ChunkInput[] = [];
+    for (const channelId of selectedChannelsForSync) {
+      try {
+        // Fetch up to 100 most recent messages per channel
+        const history = await slackClient.conversations.history({
+          channel: channelId,
+          limit: 100,
+        });
+        const channelMessages = history.messages || [];
+        totalMessages += channelMessages.length;
+
+        for (const msg of channelMessages) {
+          if (!msg.text || typeof msg.text !== "string") continue;
+          const chunk: ChunkInput = {
+            projectId,
+            sourceType: "slack",
+            sourceId: msg.ts || "",
+            chunkText: msg.text,
+            metadata: {
+              channelId,
+              user: msg.user || "",
+              timestamp: msg.ts || "",
+              permalink: `https://slack.com/archives/${channelId}/p${msg.ts?.replace(".", "")}`,
+            },
+          };
+          allChunks.push(chunk);
+        }
+      } catch (err) {
+        console.warn(`Failed to fetch messages for channel ${channelId}:`, err);
+      }
+    }
+
+    // Insert all message embeddings
+    await batchInsertEmbeddings(allChunks);
+
     const syncedData = {
-      channels: channels.length,
+      channels: selectedChannelsForSync.length,
+      messagesEmbedded: allChunks.length,
       lastSync: new Date().toISOString(),
     };
 
     // Update connection with sync info
-    const currentSettings =
-      (connection[0].settings as Record<string, unknown>) || {};
     await db
       .update(connectionsTable)
       .set({
@@ -133,6 +176,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: syncedData,
+      message: `Embedded ${allChunks.length} Slack messages from ${selectedChannelsForSync.length} channels.`,
     });
   } catch (error) {
     console.error("Slack sync error:", error);

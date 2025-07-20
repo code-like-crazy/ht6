@@ -64,7 +64,7 @@ export default function ProjectSidebar({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full max-h-svh flex-col">
       {/* Project Info Section */}
       <ProjectInfoSection project={project} user={user} />
 
