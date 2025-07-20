@@ -234,7 +234,7 @@ const JoinOrganizationModal = ({
               transition={{ duration: 0.2 }}
               className="w-full"
             >
-              <DialogHeader>
+              <DialogHeader className="mb-4">
                 <DialogTitle className="flex items-center gap-2">
                   <Button
                     variant="ghost"

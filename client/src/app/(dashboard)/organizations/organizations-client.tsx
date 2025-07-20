@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import OrganizationsHeader from "@/components/organizations/organizations-header";
 import OrganizationEmptyState from "@/components/dashboard/organization-empty-state";
 import OrganizationsGrid from "@/components/organizations/organizations-grid";
-import CreateOrganizationModal from "@/components/organizations/create-organization-modal";
-import JoinOrganizationModal from "@/components/organizations/join-organization-modal";
+import { useOrganizationModals } from "@/components/providers/organization-modal-provider";
 
 type Organization = {
   id: number;
@@ -23,8 +22,7 @@ type OrganizationsClientProps = {
 };
 
 const OrganizationsClient = ({ organizations }: OrganizationsClientProps) => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const { openCreateModal, openJoinModal } = useOrganizationModals();
 
   const handleSelectOrganization = (organization: Organization) => {
     // TODO: Navigate to organization dashboard
@@ -36,7 +34,9 @@ const OrganizationsClient = ({ organizations }: OrganizationsClientProps) => {
     const fetchGitHubData = async () => {
       try {
         // Replace with user's repository details
-        const res = await fetch("/api/integrations/github?owner=vercel&repo=next.js");
+        const res = await fetch(
+          "/api/integrations/github?owner=vercel&repo=next.js",
+        );
         const json = await res.json();
         console.log("Fetched GitHub data:", json);
       } catch (err) {
@@ -51,15 +51,15 @@ const OrganizationsClient = ({ organizations }: OrganizationsClientProps) => {
     <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:h-svh">
       <div className="border-border/60 bg-background flex h-full w-full flex-col rounded-xl border-2 border-dashed p-4 sm:p-8">
         <OrganizationsHeader
-          onCreateClick={() => setIsCreateModalOpen(true)}
-          onJoinClick={() => setIsJoinModalOpen(true)}
+          onCreateClick={openCreateModal}
+          onJoinClick={openJoinModal}
         />
 
         {organizations.length === 0 ? (
           <div className="flex flex-1 items-center justify-center">
             <OrganizationEmptyState
-              onCreateClick={() => setIsCreateModalOpen(true)}
-              onJoinClick={() => setIsJoinModalOpen(true)}
+              onCreateClick={openCreateModal}
+              onJoinClick={openJoinModal}
             />
           </div>
         ) : (
@@ -70,16 +70,6 @@ const OrganizationsClient = ({ organizations }: OrganizationsClientProps) => {
             />
           </div>
         )}
-
-        <CreateOrganizationModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-        />
-
-        <JoinOrganizationModal
-          isOpen={isJoinModalOpen}
-          onClose={() => setIsJoinModalOpen(false)}
-        />
       </div>
     </div>
   );
