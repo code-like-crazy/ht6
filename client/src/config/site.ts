@@ -1,7 +1,11 @@
 import { Home, Settings, Users, FolderOpen } from "lucide-react";
 
 export const siteConfig = {
-  title: "Loominal",
+  name: "Luminal",
+  title: "Luminal - AI-Powered Team Knowledge Engine",
+  description:
+    "Transform scattered project context into instant, cited answers. Accelerate team onboarding with AI that understands your GitHub, Linear, Slack, Figma, and Notion.",
+  url: "https://luminal.codelikecrazy.zdev",
 };
 
 export const navLinks = [
