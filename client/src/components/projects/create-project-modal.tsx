@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   createProjectSchema,
   CreateProjectFormData,
@@ -46,16 +54,19 @@ export default function CreateProjectModal({
   onClose,
   organizations,
   selectedOrganization,
-  user,
 }: CreateProjectModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Get the organization ID for the selected organization
-  const getOrganizationId = () => {
+  // Get the default organization ID for the selected organization
+  const getDefaultOrganizationId = () => {
     if (selectedOrganization === "all" && organizations.length > 0) {
       return organizations[0].id;
     }
-    return parseInt(selectedOrganization);
+    if (selectedOrganization !== "all") {
+      return parseInt(selectedOrganization);
+    }
+    return organizations.length > 0 ? organizations[0].id : undefined;
   };
 
   const form = useForm<CreateProjectFormData>({
@@ -63,7 +74,7 @@ export default function CreateProjectModal({
     defaultValues: {
       name: "",
       description: "",
-      organizationId: getOrganizationId(),
+      organizationId: getDefaultOrganizationId(),
     },
   });
 
@@ -75,20 +86,20 @@ export default function CreateProjectModal({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...data,
-          organizationId: getOrganizationId(),
-        }),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         throw new Error("Failed to create project");
       }
 
+      const project = await response.json();
+
       form.reset();
       onClose();
-      // Refresh the page to show the new project
-      window.location.reload();
+
+      // Redirect to the new project page
+      router.push(`/projects/${project.id}`);
     } catch (error) {
       console.error("Error creating project:", error);
     } finally {
@@ -138,6 +149,39 @@ export default function CreateProjectModal({
                       disabled={isLoading}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="organizationId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Organization</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                    disabled={isLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an organization" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {organizations.map((org) => (
+                        <SelectItem key={org.id} value={org.id.toString()}>
+                          <div className="flex items-center gap-2">
+                            {org.icon && (
+                              <span className="text-sm">{org.icon}</span>
+                            )}
+                            {org.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
