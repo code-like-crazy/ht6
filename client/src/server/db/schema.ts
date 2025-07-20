@@ -82,8 +82,8 @@ export const connectionsTable = pgTable("connections", {
 // pgvector support: define a custom type for the vector column
 const vector = customType<{ data: number[] }>({
   dataType() {
-    // 1536 is the dimension for OpenAI embeddings; adjust as needed
-    return "vector(1536)";
+    // 384 is the dimension for all-MiniLM-L6-v2 embeddings
+    return "vector(384)";
   },
 });
 

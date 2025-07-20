@@ -14,6 +14,7 @@ import {
   FileText,
   Users,
   Activity,
+  Loader2,
 } from "lucide-react";
 
 interface User {
@@ -23,11 +24,26 @@ interface User {
   imageUrl: string | null;
 }
 
+interface AISource {
+  id: number;
+  sourceType: string;
+  sourceId: string;
+  snippet: string;
+  metadata: Record<string, unknown>;
+}
+
 interface Message {
   id: number;
   content: string;
   sender: "user" | "assistant";
   timestamp: Date;
+  sources?: AISource[];
+  metadata?: {
+    projectName: string;
+    chunksFound: number;
+    connectionsAvailable: string[];
+    timestamp: string;
+  };
 }
 
 interface ProjectChatInterfaceProps {
@@ -41,6 +57,7 @@ export default function ProjectChatInterface({
 }: ProjectChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const quickActions = [
     {
@@ -77,21 +94,69 @@ export default function ProjectChatInterface({
     },
   ];
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  const handleSendMessage = async () => {
+    if (!message.trim() || isLoading) return;
+
+    const userMessage = message.trim();
+    setMessage("");
+    setIsLoading(true);
 
     // Add user message
-    const newMessage: Message = {
+    const newUserMessage: Message = {
       id: Date.now(),
-      content: message,
+      content: userMessage,
       sender: "user",
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
+    setMessages((prev) => [...prev, newUserMessage]);
 
-    // TODO: Send to AI and get response
+    try {
+      // Call the chat API
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectId: project.id,
+          message: userMessage,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get response");
+      }
+
+      const data = await response.json();
+
+      // Add AI response
+      const aiMessage: Message = {
+        id: Date.now() + 1,
+        content: data.message,
+        sender: "assistant",
+        timestamp: new Date(),
+        sources: data.sources,
+        metadata: data.metadata,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Chat error:", error);
+
+      // Add error message
+      const errorMessage: Message = {
+        id: Date.now() + 1,
+        content:
+          "Sorry, I encountered an error while processing your question. Please try again.",
+        sender: "assistant",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleQuickAction = (prompt: string) => {
@@ -184,13 +249,51 @@ export default function ProjectChatInterface({
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm">{msg.content}</p>
+                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  {msg.sources && msg.sources.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs font-medium opacity-70">Sources:</p>
+                      {msg.sources.map((source, index) => (
+                        <div
+                          key={source.id}
+                          className="bg-background/50 rounded border p-2 text-xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">
+                              {source.sourceType === "github" ? "📁" : "💬"}{" "}
+                              {source.sourceType}
+                            </span>
+                            <span className="opacity-70">
+                              {source.sourceId}
+                            </span>
+                          </div>
+                          <p className="mt-1 opacity-80">{source.snippet}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {msg.metadata && (
+                    <div className="mt-2 text-xs opacity-50">
+                      Found {msg.metadata.chunksFound} relevant chunks from{" "}
+                      {msg.metadata.connectionsAvailable.join(", ")}
+                    </div>
+                  )}
                   <p className="mt-1 text-xs opacity-70">
                     {msg.timestamp.toLocaleTimeString()}
                   </p>
                 </div>
               </div>
             ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-muted max-w-[80%] rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <p className="text-sm">Thinking...</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -205,8 +308,15 @@ export default function ProjectChatInterface({
             placeholder="Ask a question about your project..."
             className="flex-1"
           />
-          <Button onClick={handleSendMessage} disabled={!message.trim()}>
-            <Send className="h-4 w-4" />
+          <Button
+            onClick={handleSendMessage}
+            disabled={!message.trim() || isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </Button>
         </div>
         <p className="text-muted-foreground mt-2 text-xs">

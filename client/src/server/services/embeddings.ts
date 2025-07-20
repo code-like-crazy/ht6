@@ -20,7 +20,7 @@ export async function insertEmbedding(input: InsertEmbeddingInput) {
     sourceType: input.sourceType,
     sourceId: input.sourceId,
     chunkText: input.chunkText,
-    embedding: input.embedding,
+    embedding: `[${input.embedding.join(",")}]` as unknown as number[], // Format as vector string
     metadata: input.metadata ?? {},
   });
 }
@@ -39,10 +39,10 @@ export async function querySimilarEmbeddings({
   const result = await db.execute(
     sql`
       SELECT
-        id, source_type, source_id, chunk_text, embedding, metadata, created_at, updated_at,
-        (embedding <-> ${queryEmbedding}) AS distance
+        id, "sourceType", "sourceId", "chunkText", embedding, metadata, "createdAt", "updatedAt",
+        (embedding <-> ${sql.raw(`'[${queryEmbedding.join(",")}]'::vector`)}) AS distance
       FROM embeddings
-      WHERE project_id = ${projectId}
+      WHERE "projectId" = ${projectId}
       ORDER BY distance ASC
       LIMIT ${topK}
     `,

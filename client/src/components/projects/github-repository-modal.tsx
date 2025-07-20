@@ -23,6 +23,7 @@ import {
   Check,
   Download,
   Link,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -63,6 +64,7 @@ export default function GitHubRepositoryModal({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasInitialLoad, setHasInitialLoad] = useState(false);
+  const [syncingRepos, setSyncingRepos] = useState<Set<number>>(new Set());
 
   // Load connected repositories when modal opens
   useEffect(() => {
@@ -178,19 +180,53 @@ export default function GitHubRepositoryModal({
     await fetchRepositories();
   };
 
+  const handleSyncRepository = async (repositoryId: number) => {
+    setSyncingRepos((prev) => new Set(prev).add(repositoryId));
+
+    try {
+      const response = await fetch("/api/integrations/github/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectId,
+          repositoryId: repositoryId.toString(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to sync repository");
+      }
+
+      const data = await response.json();
+      toast.success(data.message || "Repository synced successfully!");
+    } catch (error) {
+      console.error("Error syncing repository:", error);
+      toast.error("Failed to sync repository. Please try again.");
+    } finally {
+      setSyncingRepos((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(repositoryId);
+        return newSet;
+      });
+    }
+  };
+
   const renderRepositoryCard = (
     repo: Repository,
     isSelected: boolean,
     onToggle: (id: number) => void,
+    showSyncButton = false,
   ) => (
     <div
       key={repo.id}
-      className={`cursor-pointer rounded-lg border p-5 transition-all hover:shadow-md ${
+      className={`rounded-lg border p-5 transition-all hover:shadow-md ${
         isSelected
           ? "border-primary bg-primary/5 shadow-sm"
           : "border-border/60 bg-background/50 hover:bg-background/70"
-      }`}
-      onClick={() => onToggle(repo.id)}
+      } ${!showSyncButton ? "cursor-pointer" : ""}`}
+      onClick={!showSyncButton ? () => onToggle(repo.id) : undefined}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1 space-y-3">
@@ -203,7 +239,9 @@ export default function GitHubRepositoryModal({
               )}
               <h3 className="text-base font-semibold">{repo.name}</h3>
             </div>
-            {isSelected && <Check className="text-primary h-5 w-5" />}
+            {isSelected && !showSyncButton && (
+              <Check className="text-primary h-5 w-5" />
+            )}
           </div>
 
           {repo.description && (
@@ -229,6 +267,33 @@ export default function GitHubRepositoryModal({
             <span>Updated {formatDate(repo.updated_at)}</span>
           </div>
         </div>
+
+        {showSyncButton && (
+          <div className="ml-4 flex flex-col gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSyncRepository(repo.id);
+              }}
+              disabled={syncingRepos.has(repo.id)}
+              className="min-w-[100px]"
+            >
+              {syncingRepos.has(repo.id) ? (
+                <>
+                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-3 w-3" />
+                  Sync
+                </>
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -292,16 +357,22 @@ export default function GitHubRepositoryModal({
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">
-                    Connected Repositories
-                  </h3>
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      Connected Repositories
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Click &ldquo;Sync&rdquo; to process repository files and
+                      create embeddings for AI chat
+                    </p>
+                  </div>
                   <Badge variant="secondary">
                     {connectedRepos.length} connected
                   </Badge>
                 </div>
                 <div className="max-h-[400px] space-y-4 overflow-y-auto pr-2">
                   {connectedRepos.map((repo) =>
-                    renderRepositoryCard(repo, true, () => {}),
+                    renderRepositoryCard(repo, true, () => {}, true),
                   )}
                 </div>
               </div>
