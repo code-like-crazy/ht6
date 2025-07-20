@@ -69,6 +69,7 @@ export default function GitHubRepositoryModal({
     if (isOpen && projectId) {
       loadConnectedRepositories();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, projectId]);
 
   const loadConnectedRepositories = async () => {

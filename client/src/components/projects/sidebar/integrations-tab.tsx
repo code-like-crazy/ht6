@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Plug, Settings, Github } from "lucide-react";
+import { Plus, Plug, Settings, Loader2 } from "lucide-react";
 import {
   availableIntegrations,
   integrationStatuses,
@@ -47,6 +47,7 @@ export default function IntegrationsTab({
     if (projectId && !isDemo) {
       fetchConnections();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId, isDemo]);
 
   const fetchConnections = async () => {
@@ -147,6 +148,15 @@ export default function IntegrationsTab({
     </div>
   );
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8">
+        <Loader2 className="text-muted-foreground mb-4 h-8 w-8 animate-spin" />
+        <p className="text-muted-foreground text-sm">Loading integrations...</p>
+      </div>
+    );
+  }
+
   if (connectedIntegrations.length === 0) {
     return <EmptyState />;
   }
@@ -200,12 +210,12 @@ export default function IntegrationsTab({
             </div>
             <div className="mt-3 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <p className="text-muted-foreground text-xs">
+                {/* <p className="text-muted-foreground text-xs">
                   Last sync: {integration.lastSync}
-                </p>
+                </p> */}
                 {integration.syncedItems > 0 && (
                   <p className="text-muted-foreground text-xs">
-                    {integration.syncedItems.toLocaleString()} items
+                    {integration.syncedItems.toLocaleString()} connection(s)
                   </p>
                 )}
               </div>
