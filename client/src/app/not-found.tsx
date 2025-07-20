@@ -111,6 +111,15 @@ export default function NotFound() {
                 Back to Landing Page
               </Link>
             </Button>
+            <Button asChild variant="outline" size="lg">
+              <a
+                href="https://devpost.com/software/loominal"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Project Demo
+              </a>
+            </Button>
           </motion.div>
 
           {/* Additional Info */}

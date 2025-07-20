@@ -57,7 +57,7 @@ export function SignInForm({ onToggleMode }: SignInFormProps) {
         }
 
         // Redirect to Auth0 with email pre-filled
-        window.location.href = result.redirectUrl || "/";
+        window.location.href = "/dashboard";
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       }
