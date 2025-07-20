@@ -9,6 +9,7 @@ import {
   availableIntegrations,
   IntegrationStatus,
 } from "@/config/integrations";
+import Link from "next/link";
 
 export interface ProjectIntegration {
   id: string;
@@ -20,7 +21,6 @@ interface ProjectCardProps {
   integrations?: ProjectIntegration[];
   showActions?: boolean;
   onSettingsClick?: () => void;
-  onClick?: () => void;
 }
 
 export default function ProjectCard({
@@ -28,17 +28,13 @@ export default function ProjectCard({
   integrations = [],
   showActions = false,
   onSettingsClick,
-  onClick,
 }: ProjectCardProps) {
   const connectedIntegrations = integrations.filter(
     (i) => i.status === "connected",
   );
 
   return (
-    <Card
-      className="group hover:border-primary/50 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
-      onClick={onClick}
-    >
+    <Card className="group hover:border-primary/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-start justify-between">
           <span className="line-clamp-1 text-lg">{project.name}</span>
@@ -119,6 +115,10 @@ export default function ProjectCard({
               </div>
             </div>
           )}
+
+          <Button asChild className="mt-4 w-full">
+            <Link href={`/projects/${project.id}`}>View Project</Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
