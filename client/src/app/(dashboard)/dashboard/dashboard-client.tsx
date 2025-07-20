@@ -91,7 +91,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
   ];
 
   return (
-    <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:h-svh">
+    <div className="flex h-full w-full items-center justify-center p-2 sm:p-4 lg:min-h-svh">
       <div className="border-border/60 bg-background flex h-full w-full flex-col rounded-xl border-2 border-dashed p-4 sm:p-8">
         <DashboardHeader
           title="Dashboard Overview"
@@ -196,7 +196,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
               >
                 <Link href="/team/invite">
                   <Users className="mr-2 h-4 w-4" />
-                  Invite Team
+                  Invite Members
                 </Link>
               </Button>
               <Button
