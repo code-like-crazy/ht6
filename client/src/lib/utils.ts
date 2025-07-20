@@ -32,3 +32,28 @@ export function formatDistanceToNow(date: Date): string {
     return "just now";
   }
 }
+
+export function formatDate(date: Date | string): string {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const month = months[dateObj.getMonth()];
+  const day = dateObj.getDate();
+  const year = dateObj.getFullYear();
+
+  return `${month} ${day}, ${year}`;
+}

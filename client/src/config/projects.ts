@@ -1,10 +1,10 @@
+import { formatDate } from "@/lib/utils";
 import {
   Settings,
   Share2,
   Trash2,
   FileText,
   ExternalLink,
-  Plus,
   Users,
   Activity,
   Calendar,
@@ -34,8 +34,7 @@ export const projectInfoItems = [
   {
     id: "created",
     icon: Calendar,
-    getLabel: (date: string) =>
-      `Created ${new Date(date).toLocaleDateString()}`,
+    getLabel: (date: string) => `Created ${formatDate(date)}`,
   },
   {
     id: "organization",

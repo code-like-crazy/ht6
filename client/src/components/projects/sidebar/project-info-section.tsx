@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { formatDate } from "@/lib/utils";
 
 interface User {
   id: number;
@@ -65,7 +66,7 @@ export default function ProjectInfoSection({
                 <div className="flex items-center gap-3">
                   <Calendar className="text-muted-foreground h-4 w-4" />
                   <span className="text-muted-foreground text-sm">
-                    Created {new Date(project.createdAt).toLocaleDateString()}
+                    Created {formatDate(project.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
