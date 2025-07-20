@@ -1,10 +1,10 @@
-# projectName - AI-Powered Knowledge Engine
+# Loominal - AI-Powered Knowledge Engine
 
 An intelligent knowledge engine that transforms scattered project context from GitHub, Linear, Slack, Figma, and Notion into instant, cited answers. Designed to accelerate team onboarding and eliminate the productivity tax of knowledge transfer.
 
 ## What It Does
 
-projectName solves the silent productivity problem every development team faces: new team members have countless questions but hesitate to interrupt busy teammates. Instead of forcing slow, isolated learning through scattered documentation, projectName creates a unified source of truth that provides contextual answers with full source citations.
+Loominal solves the silent productivity problem every development team faces: new team members have countless questions but hesitate to interrupt busy teammates. Instead of forcing slow, isolated learning through scattered documentation, Loominal creates a unified source of truth that provides contextual answers with full source citations.
 
 ## Architecture
 
