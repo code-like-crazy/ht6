@@ -147,7 +147,7 @@ export default function ProjectChatInterface({
               {quickActions.map((action, index) => (
                 <Card
                   key={index}
-                  className="group border-border/50 from-card/40 to-card/20 hover:from-card/60 hover:to-card/40 hover:border-primary/20 cursor-pointer bg-gradient-to-br transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                  className="group border-border from-card/40 to-card/20 hover:from-card/60 hover:to-card/40 hover:border-primary/20 cursor-pointer bg-gradient-to-br transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
                   onClick={() => handleQuickAction(action.prompt)}
                 >
                   <CardContent className="p-6">

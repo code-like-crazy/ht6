@@ -136,7 +136,7 @@ export default function IntegrationSelectionModal({
               return (
                 <div
                   key={integration.id}
-                  className="border-border/60 bg-background/50 hover:bg-background/70 rounded-xl border p-6 transition-all hover:shadow-md"
+                  className="border-border bg-background/50 hover:bg-background/70 rounded-xl border p-6 transition-all hover:shadow-md"
                 >
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex items-center gap-4">

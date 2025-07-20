@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LucideIcon, Building2 } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { LucideIcon } from "lucide-react";
+import { getIconComponent } from "@/lib/utils";
 import Link from "next/link";
 
 type ActionButton = {
@@ -51,31 +51,6 @@ const PageHeader = ({
   actions = [],
   selector,
 }: PageHeaderProps) => {
-  const getIconComponent = (iconName?: string | null) => {
-    if (!iconName) return Building2;
-
-    // Convert icon name to PascalCase if needed
-    const formattedIconName =
-      iconName.charAt(0).toUpperCase() + iconName.slice(1);
-
-    // Try to get the icon component from lucide-react
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const lucideIcons = LucideIcons as any;
-      const IconComponent =
-        lucideIcons[formattedIconName] || lucideIcons[iconName];
-
-      // Check if it's a valid React component
-      if (typeof IconComponent === "function") {
-        return IconComponent;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      console.warn(`Icon "${iconName}" not found in lucide-react`);
-    }
-
-    return Building2;
-  };
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>

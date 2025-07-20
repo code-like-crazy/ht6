@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import * as LucideIcons from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -56,4 +58,25 @@ export function formatDate(date: Date | string): string {
   const year = dateObj.getFullYear();
 
   return `${month} ${day}, ${year}`;
+}
+
+export function getIconComponent(
+  iconName: string | null | undefined,
+): LucideIcon {
+  if (!iconName) {
+    return LucideIcons.Building2;
+  }
+
+  // Convert icon name to PascalCase if needed
+  const pascalCaseIconName = iconName
+    .split(/[-_\s]/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join("");
+
+  // Try to get the icon from Lucide
+  const iconMap = LucideIcons as unknown as Record<string, LucideIcon>;
+  const IconComponent =
+    iconMap[pascalCaseIconName] || iconMap[iconName] || LucideIcons.Building2;
+
+  return IconComponent;
 }

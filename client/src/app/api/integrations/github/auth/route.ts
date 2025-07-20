@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const GITHUB_REDIRECT_URI =
   process.env.GITHUB_REDIRECT_URI ||
   `${process.env.AUTH0_BASE_URL}/api/integrations/github/callback`;

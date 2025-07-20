@@ -33,8 +33,7 @@ import {
   CreateProjectFormData,
 } from "@/lib/validations/project";
 import { OrganizationWithRole } from "@/server/services/organization";
-import { Building2 } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { getIconComponent } from "@/lib/utils";
 
 interface User {
   id: number;
@@ -59,32 +58,6 @@ export default function CreateProjectModal({
 }: CreateProjectModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  const getIconComponent = (iconName?: string | null) => {
-    if (!iconName) return Building2;
-
-    // Convert icon name to PascalCase if needed
-    const formattedIconName =
-      iconName.charAt(0).toUpperCase() + iconName.slice(1);
-
-    // Try to get the icon component from lucide-react
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const lucideIcons = LucideIcons as any;
-      const IconComponent =
-        lucideIcons[formattedIconName] || lucideIcons[iconName];
-
-      // Check if it's a valid React component
-      if (typeof IconComponent === "function") {
-        return IconComponent;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      console.warn(`Icon "${iconName}" not found in lucide-react`);
-    }
-
-    return Building2;
-  };
 
   // Get the default organization ID for the selected organization
   const getDefaultOrganizationId = () => {

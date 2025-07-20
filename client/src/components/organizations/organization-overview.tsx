@@ -2,10 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, FolderOpen, Calendar } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { Users, FolderOpen, Calendar } from "lucide-react";
 import Image from "next/image";
-import { formatDistanceToNow } from "@/lib/utils";
+import { formatDistanceToNow, getIconComponent } from "@/lib/utils";
 
 type OrganizationDetails = {
   id: number;
@@ -30,29 +29,6 @@ export default function OrganizationOverview({
   memberCount,
   projectCount,
 }: OrganizationOverviewProps) {
-  const getIconComponent = (iconName?: string | null) => {
-    if (!iconName) return Building2;
-
-    const formattedIconName =
-      iconName.charAt(0).toUpperCase() + iconName.slice(1);
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const lucideIcons = LucideIcons as any;
-      const IconComponent =
-        lucideIcons[formattedIconName] || lucideIcons[iconName];
-
-      if (typeof IconComponent === "function") {
-        return IconComponent;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      console.warn(`Icon "${iconName}" not found in lucide-react`);
-    }
-
-    return Building2;
-  };
-
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "owner":

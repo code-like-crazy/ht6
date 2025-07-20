@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProjectWithOrganization } from "@/server/services/project";
 import { Building2, Calendar, Settings } from "lucide-react";
-import { formatDistanceToNow } from "@/lib/utils";
+import { formatDistanceToNow, getIconComponent } from "@/lib/utils";
 import {
   availableIntegrations,
   IntegrationStatus,
@@ -32,6 +32,7 @@ export default function ProjectCard({
   const connectedIntegrations = integrations.filter(
     (i) => i.status === "connected",
   );
+  const IconComponent = getIconComponent(project.organization.icon);
 
   return (
     <Card className="group hover:border-primary/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-md">
@@ -62,11 +63,8 @@ export default function ProjectCard({
         <div className="space-y-3">
           <div className="space-y-2">
             <div className="text-muted-foreground flex items-center gap-2 text-xs">
-              <Building2 className="h-3 w-3" />
               <span className="flex items-center gap-1">
-                {project.organization.icon && (
-                  <span className="text-xs">{project.organization.icon}</span>
-                )}
+                <IconComponent className="size-3" />
                 {project.organization.name}
               </span>
             </div>
