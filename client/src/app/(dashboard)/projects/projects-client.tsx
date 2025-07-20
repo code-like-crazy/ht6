@@ -43,7 +43,7 @@ export default function ProjectsClient({
 
   return (
     <div className="flex h-full w-full items-center justify-center p-2 sm:p-4 lg:min-h-svh">
-      <div className="bg-background flex h-full w-full flex-col rounded-xl p-4 sm:p-8">
+      <div className="bg-background flex h-full w-full flex-col space-y-6 rounded-xl p-4 sm:p-8 md:space-y-8">
         <PageHeader
           title="Projects"
           description="Manage your projects across organizations"
