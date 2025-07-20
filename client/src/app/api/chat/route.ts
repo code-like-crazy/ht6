@@ -4,8 +4,13 @@ import { db } from "@/server/db";
 import { projectsTable, connectionsTable } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
 import { querySimilarEmbeddings } from "@/server/services/embeddings";
+import {
+  generateAIResponse,
+  filterLowQualityChunks,
+  ensureSourceDiversity,
+} from "@/server/services/ai-response";
+import { EMBEDDING_CONFIG, PIPELINE_CONFIG } from "@/config/embeddings";
 import { pipeline } from "@xenova/transformers";
-import { GoogleGenAI } from "@google/genai";
 
 // Use a singleton to avoid reloading the model on every request
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,84 +37,11 @@ async function generateEmbedding(text: string): Promise<number[]> {
   if (!featureExtractor) {
     featureExtractor = await pipeline(
       "feature-extraction",
-      "Xenova/all-MiniLM-L6-v2",
+      EMBEDDING_CONFIG.model,
     );
   }
-  const output = await featureExtractor(text, {
-    pooling: "mean",
-    normalize: true,
-  });
+  const output = await featureExtractor(text, PIPELINE_CONFIG);
   return Array.from(output.data);
-}
-
-// AI response generation using Google Gemini
-async function generateAIResponse(
-  question: string,
-  context: string,
-  sources: EmbeddingChunk[],
-): Promise<{ answer: string; sources: AISource[] }> {
-  try {
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GOOGLE_AI_API_KEY,
-    });
-
-    const prompt = `You are Loominal, an AI assistant that helps teams understand their projects by analyzing code, conversations, and documentation. Based on the following context from the project, answer the user's question in a helpful and specific way.
-
-IMPORTANT INSTRUCTIONS:
-- Be conversational and helpful, like a knowledgeable teammate
-- Cite specific information from the context when relevant
-- If the context doesn't contain enough information, say so clearly
-- Focus on being practical and actionable
-- Use the source information to provide specific references
-
-CONTEXT FROM PROJECT:
-${context}
-
-USER QUESTION: ${question}
-
-Please provide a comprehensive answer based on the available context.`;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
-      contents: prompt,
-    });
-
-    const answer =
-      response.text || "I couldn't generate a response. Please try again.";
-
-    return {
-      answer,
-      sources: sources.map((source: EmbeddingChunk) => ({
-        id: source.id,
-        sourceType: source.source_type,
-        sourceId: source.source_id,
-        snippet: source.chunk_text.substring(0, 200) + "...",
-        metadata: source.metadata,
-      })),
-    };
-  } catch (error) {
-    console.error("Gemini API error:", error);
-
-    // Fallback response if Gemini fails
-    const fallbackAnswer = `I found ${sources.length} relevant pieces of information related to your question: "${question}".
-
-${context.length > 0 ? `Here's what I found:\n\n${context.substring(0, 500)}...` : "I couldn't find specific information to answer your question in the current project context."}
-
-${sources.length > 0 ? `\nThis information comes from ${sources.length} source(s) in your project.` : ""}
-
-(Note: AI service temporarily unavailable, showing basic context match)`;
-
-    return {
-      answer: fallbackAnswer,
-      sources: sources.map((source: EmbeddingChunk) => ({
-        id: source.id,
-        sourceType: source.source_type,
-        sourceId: source.source_id,
-        snippet: source.chunk_text.substring(0, 200) + "...",
-        metadata: source.metadata,
-      })),
-    };
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -148,48 +80,17 @@ export async function POST(req: NextRequest) {
     const allSimilarChunksRaw = await querySimilarEmbeddings({
       projectId: parseInt(projectId),
       queryEmbedding,
-      topK: 30, // Get more chunks to ensure diversity
+      topK: EMBEDDING_CONFIG.maxChunksToRetrieve,
     });
 
-    // Filter out low-quality chunks (like Slack join/leave messages)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const filteredChunks = allSimilarChunksRaw.filter((chunk: any) => {
-      const chunkText = chunk.chunkText as string;
+    // Filter out low-quality chunks using the new utility function
+    const filteredChunks = filterLowQualityChunks(allSimilarChunksRaw);
 
-      // Filter out Slack system messages
-      if (chunk.sourceType === "slack") {
-        const lowQualityPatterns = [
-          /has joined the channel/i,
-          /has left the channel/i,
-          /set the channel topic/i,
-          /pinned a message/i,
-          /unpinned a message/i,
-          /uploaded a file/i,
-          /started a call/i,
-          /ended a call/i,
-          /changed the channel name/i,
-          /archived this channel/i,
-          /unarchived this channel/i,
-          /<@U[A-Z0-9]+> has joined/i,
-          /<@U[A-Z0-9]+> has left/i,
-        ];
+    // Ensure diversity across source types using the new utility function
+    const similarChunksRaw = ensureSourceDiversity(filteredChunks);
 
-        // Check if the chunk text matches any low-quality patterns
-        if (lowQualityPatterns.some((pattern) => pattern.test(chunkText))) {
-          return false;
-        }
-
-        // Filter out very short messages (likely not useful)
-        if (chunkText.trim().length < 20) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    // Group chunks by source type and select diverse sources
-    const chunksBySourceType = filteredChunks.reduce(
+    // Group chunks by source type for logging
+    const chunksBySourceType = similarChunksRaw.reduce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (acc, chunk: any) => {
         const sourceType = chunk.sourceType as string;
@@ -201,39 +102,6 @@ export async function POST(req: NextRequest) {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {} as Record<string, any[]>,
-    );
-
-    // Select top chunks from each source type to ensure diversity
-    const similarChunksRaw: typeof allSimilarChunksRaw = [];
-    const maxPerSourceType = 4; // Max chunks per source type
-    const sourceTypes = Object.keys(chunksBySourceType);
-
-    // Prioritize getting at least one chunk from each source type
-    sourceTypes.forEach((sourceType) => {
-      const chunks = chunksBySourceType[
-        sourceType
-      ] as typeof allSimilarChunksRaw;
-      const chunksToAdd = Math.min(chunks.length, maxPerSourceType);
-      similarChunksRaw.push(...chunks.slice(0, chunksToAdd));
-    });
-
-    // If we have fewer than 10 chunks, fill up with the best remaining ones
-    if (similarChunksRaw.length < 10) {
-      const usedChunkIds = new Set(similarChunksRaw.map((chunk) => chunk.id));
-      const remainingChunks = allSimilarChunksRaw.filter(
-        (chunk) => !usedChunkIds.has(chunk.id),
-      );
-      const additionalChunks = remainingChunks.slice(
-        0,
-        10 - similarChunksRaw.length,
-      );
-      similarChunksRaw.push(...additionalChunks);
-    }
-
-    // Sort by distance to maintain relevance order
-    similarChunksRaw.sort(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (a: any, b: any) => (a.distance as number) - (b.distance as number),
     );
 
     // Log source type distribution for debugging
@@ -262,30 +130,8 @@ export async function POST(req: NextRequest) {
       }),
     );
 
-    // Prepare context from similar chunks
-    const context = similarChunks
-      .map((chunk: EmbeddingChunk) => {
-        const metadata = chunk.metadata || {};
-        let contextPrefix = "";
-
-        if (chunk.source_type === "github") {
-          contextPrefix = `[GitHub - ${metadata.filePath || chunk.source_id}]: `;
-        } else if (chunk.source_type === "slack") {
-          contextPrefix = `[Slack - ${metadata.channel || "channel"}]: `;
-        } else {
-          contextPrefix = `[${chunk.source_type}]: `;
-        }
-
-        return contextPrefix + chunk.chunk_text;
-      })
-      .join("\n\n");
-
-    // Generate AI response
-    const aiResponse = await generateAIResponse(
-      message,
-      context,
-      similarChunks,
-    );
+    // Generate AI response using the new modular function
+    const aiResponse = await generateAIResponse(message, similarChunks);
 
     // Get project connections for additional context
     const connections = await db
