@@ -4,9 +4,9 @@ import { redirect, notFound } from "next/navigation";
 import ProjectDetailClient from "./project-detail-client";
 
 interface ProjectDetailPageProps {
-  params: {
+  params: Promise<{
     projectId: string;
-  };
+  }>;
 }
 
 const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
@@ -16,7 +16,7 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
     redirect("/login");
   }
 
-  const projectId = parseInt(params.projectId);
+  const projectId = parseInt((await params).projectId);
 
   if (isNaN(projectId)) {
     notFound();
