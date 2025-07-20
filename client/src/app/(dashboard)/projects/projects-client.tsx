@@ -79,7 +79,7 @@ export default function ProjectsClient({
             />
           </div>
         ) : (
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1">
             <ProjectsGrid projects={filteredProjects} />
           </div>
         )}

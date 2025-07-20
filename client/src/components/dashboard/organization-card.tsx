@@ -68,9 +68,9 @@ const OrganizationCard = ({
   const IconComponent = getIconComponent(organization.icon);
 
   return (
-    <Card className="border-border group hover:border-primary/50 cursor-pointer p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
+    <Card className="border-border group hover:border-primary/50 flex h-full cursor-pointer flex-col p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
       {/* Mobile Layout */}
-      <div className="block sm:hidden">
+      <div className="block flex flex-1 flex-col sm:hidden">
         <div className="mb-3 flex items-start justify-between">
           <div className="flex min-w-0 flex-1 items-center space-x-3">
             <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg">
@@ -127,7 +127,10 @@ const OrganizationCard = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
+        {/* Spacer to push bottom content down */}
+        <div className="flex-1"></div>
+
+        <div className="mt-auto flex items-center justify-between">
           <p className="text-muted-foreground truncate text-xs">
             Created{" "}
             {new Date(organization.createdAt).toLocaleDateString("en-US", {
@@ -148,7 +151,7 @@ const OrganizationCard = ({
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden sm:block">
+      <div className="flex hidden flex-1 flex-col sm:block">
         <div className="flex items-start justify-between">
           <div className="flex min-w-0 flex-1 items-center space-x-4">
             <div className="bg-primary/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
@@ -203,6 +206,9 @@ const OrganizationCard = ({
             </Button>
           </div>
         </div>
+
+        {/* Spacer to push bottom content down */}
+        <div className="flex-1"></div>
 
         <div className="mt-4 flex items-center justify-between">
           <p className="text-muted-foreground text-xs">
