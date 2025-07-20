@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/server/db";
+import { connectionsTable } from "@/server/db/schema";
+import { eq, and } from "drizzle-orm";
+import { getCurrentUser } from "@/server/services/user";
 
 type GitHubItem = {
   type: "pr" | "issue" | "commit";
@@ -11,11 +15,10 @@ type GitHubItem = {
 
 const GITHUB_API_BASE = "https://api.github.com";
 
-// const GITHUB_ACCESS_TOKEN = process.env.GITHUB_ACCESS_TOKEN!;
-
 export async function GET(req: NextRequest) {
   const owner = req.nextUrl.searchParams.get("owner");
   const repo = req.nextUrl.searchParams.get("repo");
+  const projectId = req.nextUrl.searchParams.get("projectId");
 
   if (!owner || !repo) {
     return NextResponse.json(
@@ -24,11 +27,47 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const headers = {
-    // Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
+  // Verify user has access and get GitHub connection
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let accessToken = null;
+  if (projectId) {
+    // Get GitHub connection for this project
+    const [connection] = await db
+      .select()
+      .from(connectionsTable)
+      .where(
+        and(
+          eq(connectionsTable.projectId, parseInt(projectId)),
+          eq(connectionsTable.type, "github"),
+          eq(connectionsTable.isActive, 1),
+        ),
+      )
+      .limit(1);
+
+    if (connection?.credentials) {
+      const credentials = connection.credentials as {
+        access_token?: string;
+        username?: string;
+        user_id?: number;
+        avatar_url?: string;
+        scopes?: string[];
+      };
+      accessToken = credentials.access_token;
+    }
+  }
+
+  const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
   };
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
 
   const results: GitHubItem[] = [];
 
