@@ -6,6 +6,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Settings, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 interface SidebarUserProfileProps {
@@ -14,6 +22,15 @@ interface SidebarUserProfileProps {
 
 const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
   const { user, isLoading } = useUser();
+  const router = useRouter();
+
+  const handleSettings = () => {
+    router.push("/settings");
+  };
+
+  const handleLogout = () => {
+    window.location.href = "/api/auth/custom-logout";
+  };
 
   const userAvatar = user?.imageUrl ? (
     <Image
@@ -24,7 +41,7 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
       height={40}
     />
   ) : (
-    <div className="bg-primary/10 border-primary/20 flex h-10 w-10 items-center justify-center rounded-full border">
+    <div className="bg-primary/10 border-border flex h-10 w-10 items-center justify-center rounded-full border">
       <span className="text-primary font-sans text-sm font-semibold">
         {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
       </span>
@@ -41,7 +58,7 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
 
   if (isLoading) {
     return (
-      <div className="border-sidebar-border/50 border-t p-4">
+      <div className="border-sidebar-border border-t p-4">
         <div
           className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"} rounded-xl p-2`}
         >
@@ -65,21 +82,59 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
     return (
       <div className="border-sidebar-border/50 border-t p-4">
         <div className="flex justify-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="hover:bg-sidebar-accent/30 cursor-pointer rounded-xl p-2 transition-colors">
-                {user ? userAvatar : guestAvatar}
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              <div className="text-center">
-                <p className="font-medium">{user?.name || "Guest"}</p>
-                <p className="text-xs opacity-70">
-                  {user?.email || "Not signed in"}
-                </p>
-              </div>
-            </TooltipContent>
-          </Tooltip>
+          {user ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="hover:bg-sidebar-accent/30 cursor-pointer rounded-xl p-2 transition-colors">
+                  {userAvatar}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent side="right" className="w-48 p-2">
+                <div className="space-y-1">
+                  <div className="px-2 py-1.5 text-sm">
+                    <p className="truncate font-medium">{user.name}</p>
+                    <p className="text-muted-foreground truncate text-xs">
+                      {user.email}
+                    </p>
+                  </div>
+                  <div className="border-t pt-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-full justify-start"
+                      onClick={handleSettings}
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="hover:bg-sidebar-accent/30 cursor-pointer rounded-xl p-2 transition-colors">
+                  {guestAvatar}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <div className="text-center">
+                  <p className="font-medium">Guest</p>
+                  <p className="text-xs opacity-70">Not signed in</p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
     );
@@ -88,21 +143,55 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
   return (
     <div className="border-sidebar-border/50 border-t p-4">
       {user ? (
-        <div className="hover:bg-sidebar-accent/30 flex items-center space-x-3 rounded-xl p-2 transition-colors">
-          {userAvatar}
-          <div
-            className={`min-w-0 flex-1 overflow-hidden transition-all duration-300 ${
-              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
-            }`}
-          >
-            <p className="text-sidebar-foreground truncate font-sans text-sm font-medium">
-              {user.name}
-            </p>
-            <p className="text-sidebar-foreground/60 truncate font-sans text-xs">
-              {user.email}
-            </p>
-          </div>
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="hover:bg-sidebar-accent/30 flex w-full items-center space-x-3 rounded-xl p-2 transition-colors">
+              {userAvatar}
+              <div
+                className={`min-w-0 flex-1 overflow-hidden transition-all duration-300 ${
+                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                }`}
+              >
+                <p className="text-sidebar-foreground truncate font-sans text-sm font-medium">
+                  {user.name}
+                </p>
+                <p className="text-sidebar-foreground/60 truncate font-sans text-xs">
+                  {user.email}
+                </p>
+              </div>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" className="w-48 p-2">
+            <div className="space-y-1">
+              <div className="px-2 py-1.5 text-sm">
+                <p className="truncate font-medium">{user.name}</p>
+                <p className="text-muted-foreground truncate text-xs">
+                  {user.email}
+                </p>
+              </div>
+              <div className="border-t pt-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start"
+                  onClick={handleSettings}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       ) : (
         <div className="flex items-center space-x-3 rounded-xl p-2">
           {guestAvatar}
