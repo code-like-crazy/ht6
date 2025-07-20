@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, User, Mail, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, User, Mail, Calendar, UserPlus } from "lucide-react";
 import Image from "next/image";
 import { formatDistanceToNow } from "@/lib/utils";
+import InviteMemberModal from "./invite-member-modal";
 
 type OrganizationMember = {
   id: number;
@@ -25,12 +28,17 @@ type CurrentUser = {
 interface TeamMembersSectionProps {
   members: OrganizationMember[];
   currentUser: CurrentUser;
+  organizationId: number;
+  organizationName: string;
 }
 
 export default function TeamMembersSection({
   members,
   currentUser,
+  organizationId,
+  organizationName,
 }: TeamMembersSectionProps) {
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case "owner":
@@ -134,7 +142,36 @@ export default function TeamMembersSection({
               </div>
             );
           })}
+
+          {/* Invite Member Button */}
+          <div className="group border-border/60 hover:border-primary/50 relative overflow-hidden rounded-lg border border-dashed p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <Button
+              variant="ghost"
+              className="h-full w-full flex-col space-y-3 p-0"
+              onClick={() => setIsInviteModalOpen(true)}
+            >
+              <div className="bg-primary/10 ring-primary/20 group-hover:ring-primary/50 flex h-14 w-14 items-center justify-center rounded-full ring-2 transition-all">
+                <UserPlus className="text-primary h-6 w-6" />
+              </div>
+
+              <div className="w-full space-y-2 text-center">
+                <h3 className="text-foreground text-sm font-medium">
+                  Invite Member
+                </h3>
+                <p className="text-muted-foreground text-xs">
+                  Add a new team member
+                </p>
+              </div>
+            </Button>
+          </div>
         </div>
+
+        <InviteMemberModal
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          organizationId={organizationId}
+          organizationName={organizationName}
+        />
       </CardContent>
     </Card>
   );

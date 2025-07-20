@@ -103,7 +103,12 @@ export default function OrganizationDetailClient({
         />
 
         {/* Team Members Section */}
-        <TeamMembersSection members={members} currentUser={currentUser} />
+        <TeamMembersSection
+          members={members}
+          currentUser={currentUser}
+          organizationId={organization.id}
+          organizationName={organization.name}
+        />
 
         {/* Projects Section */}
         <ProjectsSection
