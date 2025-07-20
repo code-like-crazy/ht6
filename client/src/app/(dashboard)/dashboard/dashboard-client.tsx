@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardHeader from "@/components/dashboard/header";
+import PageHeader from "@/components/shared/page-header";
 import OrganizationEmptyState from "@/components/dashboard/organization-empty-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,12 +92,17 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
 
   return (
     <div className="flex h-full w-full items-center justify-center p-2 sm:p-4 lg:min-h-svh">
-      <div className="border-border/60 bg-background flex h-full w-full flex-col rounded-xl border-2 border-dashed p-4 sm:p-8">
-        <DashboardHeader
+      <div className="bg-background flex h-full w-full flex-col rounded-xl p-4 sm:p-8">
+        <PageHeader
           title="Dashboard Overview"
           description="Monitor your team's progress, recent activity, and key metrics across all projects."
-          createButtonText="New Project"
-          createButtonHref="/projects/create"
+          actions={[
+            {
+              label: "New Project",
+              icon: Plus,
+              href: "/projects/create",
+            },
+          ]}
         />
 
         {/* Quick Stats */}

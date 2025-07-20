@@ -3,10 +3,11 @@
 import { useState, useMemo } from "react";
 import { ProjectWithOrganization } from "@/server/services/project";
 import { OrganizationWithRole } from "@/server/services/organization";
-import ProjectsHeader from "@/components/projects/projects-header";
+import PageHeader from "@/components/shared/page-header";
 import ProjectsGrid from "@/components/projects/projects-grid";
 import ProjectEmptyState from "@/components/projects/project-empty-state";
 import CreateProjectModal from "@/components/projects/create-project-modal";
+import { Plus } from "lucide-react";
 
 interface User {
   id: number;
@@ -42,12 +43,31 @@ export default function ProjectsClient({
 
   return (
     <div className="flex h-full w-full items-center justify-center p-2 sm:p-4 lg:min-h-svh">
-      <div className="border-border/60 bg-background flex h-full w-full flex-col rounded-xl border-2 border-dashed p-4 sm:p-8">
-        <ProjectsHeader
-          organizations={organizations}
-          selectedOrganization={selectedOrganization}
-          onOrganizationChange={setSelectedOrganization}
-          onCreateProject={() => setIsCreateModalOpen(true)}
+      <div className="bg-background flex h-full w-full flex-col rounded-xl p-4 sm:p-8">
+        <PageHeader
+          title="Projects"
+          description="Manage your projects across organizations"
+          selector={{
+            value: selectedOrganization,
+            onValueChange: setSelectedOrganization,
+            options: [
+              { value: "all", label: "All Organizations" },
+              ...organizations.map((org) => ({
+                value: org.id.toString(),
+                label: org.name,
+                icon: org.icon || undefined,
+              })),
+            ],
+            placeholder: "Select organization",
+            width: "sm:w-[200px]",
+          }}
+          actions={[
+            {
+              label: "Create Project",
+              icon: Plus,
+              onClick: () => setIsCreateModalOpen(true),
+            },
+          ]}
         />
 
         {filteredProjects.length === 0 ? (

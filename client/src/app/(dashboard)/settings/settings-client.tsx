@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import DashboardHeader from "@/components/dashboard/header";
+import PageHeader from "@/components/shared/page-header";
 import {
   User,
   Building2,
@@ -82,11 +82,10 @@ const SettingsClient = ({ user }: SettingsClientProps) => {
 
   return (
     <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:min-h-svh">
-      <div className="border-border/60 bg-background flex h-full w-full flex-col rounded-xl border-2 border-dashed p-4 sm:p-8">
-        <DashboardHeader
+      <div className="bg-background flex h-full w-full flex-col rounded-xl p-4 sm:p-8">
+        <PageHeader
           title="Settings"
           description="Manage your account settings, preferences, and organization memberships."
-          showCreateButton={false}
         />
 
         <div className="mt-6 space-y-6 sm:mt-8">

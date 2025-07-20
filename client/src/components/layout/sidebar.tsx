@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Sidebar = () => {
   return (
-    <div className="border-sidebar-border fixed top-0 left-0 z-40 hidden h-screen w-64 flex-col border-r lg:flex">
+    <div className="fixed top-0 left-0 z-40 hidden h-screen w-64 flex-col lg:flex">
       {/* Logo/Brand Section */}
       <SidebarLogo />
 
