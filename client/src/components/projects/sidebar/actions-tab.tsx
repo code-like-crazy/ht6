@@ -12,12 +12,14 @@ interface User {
 }
 
 interface ActionsTabProps {
+  isDemo?: boolean;
   project: ProjectWithOrganization;
   user: User;
   onAction?: (actionId: string) => void;
 }
 
 export default function ActionsTab({
+  isDemo = true,
   project,
   user,
   onAction,

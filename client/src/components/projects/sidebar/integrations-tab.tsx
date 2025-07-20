@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Plug } from "lucide-react";
 import {
   availableIntegrations,
   mockConnectedIntegrations,
@@ -9,21 +9,56 @@ import {
 } from "@/config/integrations";
 
 interface IntegrationsTabProps {
+  isDemo?: boolean;
+  projectId?: number;
   onAddIntegration?: () => void;
 }
 
 export default function IntegrationsTab({
+  isDemo = true,
+  projectId,
   onAddIntegration,
 }: IntegrationsTabProps) {
-  const connectedIntegrations = mockConnectedIntegrations.map((connected) => {
-    const integration = availableIntegrations.find(
-      (int) => int.id === connected.id,
-    );
-    return {
-      ...integration!,
-      ...connected,
-    };
-  });
+  // TODO: Replace with actual data fetching when isDemo is false
+  const connectedIntegrations = isDemo
+    ? mockConnectedIntegrations.map((connected) => {
+        const integration = availableIntegrations.find(
+          (int) => int.id === connected.id,
+        );
+        return {
+          ...integration!,
+          ...connected,
+        };
+      })
+    : []; // In real implementation, fetch from database using projectId
+
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+        <Plug className="text-muted-foreground h-8 w-8" />
+      </div>
+      <h4 className="text-foreground mb-2 text-sm font-semibold">
+        No integrations connected
+      </h4>
+      <p className="text-muted-foreground mb-4 text-xs">
+        Connect your tools to start syncing project data and enable AI-powered
+        insights.
+      </p>
+      <Button
+        variant="outline"
+        size="sm"
+        className="px-4 py-2"
+        onClick={onAddIntegration}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Connect First Tool
+      </Button>
+    </div>
+  );
+
+  if (connectedIntegrations.length === 0) {
+    return <EmptyState />;
+  }
 
   return (
     <div className="space-y-4">

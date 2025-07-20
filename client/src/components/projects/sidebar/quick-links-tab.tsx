@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus, ExternalLink } from "lucide-react";
+import { Plus, ExternalLink, Link } from "lucide-react";
 import { availableIntegrations } from "@/config/integrations";
 
 interface QuickLink {
@@ -11,6 +11,8 @@ interface QuickLink {
 }
 
 interface QuickLinksTabProps {
+  isDemo?: boolean;
+  projectId?: number;
   links?: QuickLink[];
   onAddLink?: () => void;
 }
@@ -39,9 +41,40 @@ const mockQuickLinks: QuickLink[] = [
 ];
 
 export default function QuickLinksTab({
-  links = mockQuickLinks,
+  isDemo = true,
+  projectId,
+  links,
   onAddLink,
 }: QuickLinksTabProps) {
+  // TODO: Replace with actual data fetching when isDemo is false
+  const quickLinks = isDemo ? links || mockQuickLinks : []; // In real implementation, fetch from database using projectId
+
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <div className="bg-muted/50 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+        <Link className="text-muted-foreground h-8 w-8" />
+      </div>
+      <h4 className="text-foreground mb-2 text-sm font-semibold">
+        No quick links added
+      </h4>
+      <p className="text-muted-foreground mb-4 text-xs">
+        Add shortcuts to important project resources for quick access.
+      </p>
+      <Button
+        variant="outline"
+        size="sm"
+        className="px-4 py-2"
+        onClick={onAddLink}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Add First Link
+      </Button>
+    </div>
+  );
+
+  if (quickLinks.length === 0) {
+    return <EmptyState />;
+  }
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -59,7 +92,7 @@ export default function QuickLinksTab({
         </Button>
       </div>
 
-      {links.map((link, index) => {
+      {quickLinks.map((link, index) => {
         const integration = availableIntegrations.find(
           (int) => int.id === link.integrationId,
         );
