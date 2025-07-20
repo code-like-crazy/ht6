@@ -147,16 +147,18 @@ export default function SlackChannelsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Select Slack Channels</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-h-[90vh] w-full overflow-hidden p-4 sm:max-w-4xl sm:p-6">
+        <DialogHeader className="pb-4 sm:pb-6">
+          <DialogTitle className="text-lg sm:text-xl">
+            Select Slack Channels
+          </DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">
             Choose which channels from {connectionName} you want Loominal to
             access for context and knowledge extraction.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="flex flex-col space-y-4 sm:space-y-8">
           {/* Search */}
           <div className="relative">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
@@ -169,12 +171,13 @@ export default function SlackChannelsModal({
           </div>
 
           {/* Select All */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button
               variant="outline"
               size="sm"
               onClick={handleSelectAll}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               {(() => {
                 const accessibleChannels = filteredChannels.filter(
@@ -192,51 +195,64 @@ export default function SlackChannelsModal({
                   : "Select All Accessible";
               })()}
             </Button>
-            <span className="text-muted-foreground text-sm">
+            <span className="text-muted-foreground text-center text-sm sm:text-left">
               {selectedChannels.size} of {filteredChannels.length} selected
             </span>
           </div>
 
           {/* Channels List */}
-          <div className="max-h-96 space-y-2 overflow-y-auto">
+          <div className="grid max-h-[40vh] grid-cols-1 gap-3 overflow-y-auto pr-1 sm:max-h-[50vh] sm:gap-4 sm:pr-2">
             {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <span className="ml-2">Loading channels...</span>
+              <div className="flex items-center justify-center py-8 sm:py-12">
+                <Loader2 className="h-5 w-5 animate-spin sm:h-6 sm:w-6" />
+                <span className="ml-2 text-sm sm:text-base">
+                  Loading channels...
+                </span>
               </div>
             ) : (
               filteredChannels.map((channel) => (
                 <div
                   key={channel.id}
-                  className={`flex items-center space-x-3 rounded-lg border p-3 ${
-                    !channel.is_member
-                      ? "opacity-50"
-                      : "hover:bg-muted/50 cursor-pointer"
+                  className={`border-border bg-background/50 hover:bg-background/70 rounded-lg border p-4 transition-all hover:shadow-md sm:rounded-xl sm:p-6 ${
+                    !channel.is_member ? "opacity-50" : "cursor-pointer"
                   }`}
                   onClick={() =>
                     channel.is_member && handleChannelToggle(channel.id)
                   }
                 >
-                  <Checkbox
-                    checked={selectedChannels.has(channel.id)}
-                    disabled={!channel.is_member}
-                    onChange={() => handleChannelToggle(channel.id)}
-                  />
+                  <div className="flex items-start justify-between">
+                    <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
+                      <Checkbox
+                        checked={selectedChannels.has(channel.id)}
+                        disabled={!channel.is_member}
+                        onChange={() => handleChannelToggle(channel.id)}
+                        className="mt-1 flex-shrink-0"
+                      />
 
-                  <div className="flex items-center space-x-2">
-                    {channel.is_private ? (
-                      <Lock className="text-muted-foreground h-4 w-4" />
-                    ) : (
-                      <Hash className="text-muted-foreground h-4 w-4" />
-                    )}
-                    <span className="font-medium">#{channel.name}</span>
-                  </div>
+                      <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-3">
+                        <div className="bg-muted flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10">
+                          {channel.is_private ? (
+                            <Lock className="text-muted-foreground h-4 w-4 sm:h-5 sm:w-5" />
+                          ) : (
+                            <Hash className="text-muted-foreground h-4 w-4 sm:h-5 sm:w-5" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-foreground truncate text-sm font-semibold sm:text-base">
+                            #{channel.name}
+                          </h3>
+                          {channel.purpose?.value && (
+                            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed sm:text-sm">
+                              {channel.purpose.value.length > 80
+                                ? `${channel.purpose.value.substring(0, 80)}...`
+                                : channel.purpose.value}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="flex flex-1 items-center justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {channel.purpose?.value || "No description"}
-                    </span>
-                    <div className="flex items-center space-x-2">
+                    <div className="ml-2 flex flex-col items-end gap-1 sm:gap-2">
                       {channel.num_members && (
                         <Badge variant="secondary" className="text-xs">
                           {channel.num_members} members
@@ -244,7 +260,12 @@ export default function SlackChannelsModal({
                       )}
                       {!channel.is_member && (
                         <Badge variant="outline" className="text-xs">
-                          Not a member
+                          Not member
+                        </Badge>
+                      )}
+                      {channel.is_private && (
+                        <Badge variant="outline" className="text-xs">
+                          Private
                         </Badge>
                       )}
                     </div>
@@ -254,14 +275,28 @@ export default function SlackChannelsModal({
             )}
           </div>
 
+          {filteredChannels.length === 0 && !isLoading && (
+            <div className="py-8 text-center sm:py-12">
+              <p className="text-muted-foreground text-sm sm:text-base">
+                No channels found matching your search.
+              </p>
+            </div>
+          )}
+
           {/* Actions */}
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={onClose} disabled={isSaving}>
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end sm:space-x-3 sm:pt-4">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isSaving}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={selectedChannels.size === 0 || isSaving}
+              className="w-full px-6 sm:w-auto"
             >
               {isSaving ? (
                 <>
