@@ -30,6 +30,7 @@ interface AISource {
 interface AIResponse {
   answer: string;
   sources: AISource[];
+  provider?: string;
 }
 
 /**
@@ -76,6 +77,7 @@ export async function generateAIResponse(
     return {
       answer,
       sources,
+      provider: "gemini",
     };
   } catch (error) {
     console.error("Gemini API error:", error);
@@ -100,6 +102,7 @@ export async function generateAIResponse(
         snippet: chunk.chunk_text.substring(0, 200) + "...",
         metadata: chunk.metadata,
       })),
+      provider: "gemini-fallback",
     };
   }
 }

@@ -9,6 +9,7 @@ import {
   filterLowQualityChunks,
   ensureSourceDiversity,
 } from "@/server/services/ai-response";
+import { generateVellumResponse } from "@/server/services/vellum-ai";
 import { EMBEDDING_CONFIG, PIPELINE_CONFIG } from "@/config/embeddings";
 import { pipeline } from "@xenova/transformers";
 
@@ -122,7 +123,12 @@ function shouldFetchNewSources(
 
 export async function POST(req: NextRequest) {
   try {
-    const { projectId, message, conversationHistory = [] } = await req.json();
+    const {
+      projectId,
+      message,
+      conversationHistory = [],
+      useVellum = false,
+    } = await req.json();
 
     if (!projectId || !message) {
       return NextResponse.json(
@@ -217,11 +223,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate AI response using conversation history and optionally new sources
-    const aiResponse = await generateAIResponse(
-      message,
-      similarChunks,
-      conversationHistory,
-    );
+    // Choose between Vellum AI and Google Gemini based on the useVellum parameter
+    const aiResponse = useVellum
+      ? await generateVellumResponse(
+          message,
+          similarChunks,
+          conversationHistory,
+        )
+      : await generateAIResponse(message, similarChunks, conversationHistory);
 
     // Get project connections for additional context
     const connections = await db
@@ -249,6 +258,7 @@ export async function POST(req: NextRequest) {
             (chunks as any[]).length,
           ]),
         ),
+        aiProvider: aiResponse.provider || (useVellum ? "vellum" : "gemini"),
         timestamp: new Date().toISOString(),
       },
     });

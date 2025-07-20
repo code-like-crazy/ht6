@@ -3,9 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { ProjectWithOrganization } from "@/server/services/project";
 import { QuickAction, ChatMessage as ChatMessageType } from "@/types/chat";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import ChatMessageComponent from "./chat/chat-message";
-import QuickActions from "./chat/quick-actions";
 import ChatInput from "./chat/chat-input";
 import EmptyState from "./chat/empty-state";
 import LoadingMessage from "./chat/loading-message";
@@ -16,7 +15,10 @@ import {
   Activity,
   Users,
   Clock,
+  Bot,
+  Sparkles,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface User {
   id: number;
@@ -37,6 +39,7 @@ export default function ProjectChatInterface({
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [useVellum, setUseVellum] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickActions: QuickAction[] = [
@@ -111,6 +114,7 @@ export default function ProjectChatInterface({
           projectId: project.id,
           message: userMessage,
           conversationHistory: updatedMessages.slice(-10), // Send last 10 messages for context
+          useVellum: useVellum, // Include the AI provider preference
         }),
       });
 
@@ -155,6 +159,58 @@ export default function ProjectChatInterface({
 
   return (
     <div className="flex h-full flex-col">
+      {/* AI Provider Toggle */}
+      <div className="border-border/40 border-b p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Bot className="text-muted-foreground h-4 w-4" />
+            <span className="text-sm font-medium">AI Provider</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-sm ${!useVellum ? "text-foreground font-medium" : "text-muted-foreground"}`}
+              >
+                Google Gemini
+              </span>
+              <button
+                onClick={() => setUseVellum(!useVellum)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  useVellum ? "bg-primary" : "bg-muted"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    useVellum ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+              <span
+                className={`text-sm ${useVellum ? "text-foreground font-medium" : "text-muted-foreground"}`}
+              >
+                Vellum AI
+              </span>
+            </div>
+            <Badge
+              variant={useVellum ? "default" : "secondary"}
+              className="gap-1"
+            >
+              {useVellum ? (
+                <>
+                  <Sparkles className="h-3 w-3" />
+                  Vellum
+                </>
+              ) : (
+                <>
+                  <Bot className="h-3 w-3" />
+                  Gemini
+                </>
+              )}
+            </Badge>
+          </div>
+        </div>
+      </div>
+
       {/* Chat Messages Area */}
       <div className="flex-1 overflow-hidden">
         {messages.length === 0 ? (
