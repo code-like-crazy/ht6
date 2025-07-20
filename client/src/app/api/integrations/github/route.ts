@@ -95,41 +95,55 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const repoRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}`, { headers });
+    // Get basic repository information
+    const repoRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}`, {
+      headers,
+    });
     const repoData = await repoRes.json();
-    const branch = repoData.default_branch || "main";
 
-    const treeRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`, { headers });
+    // Get file tree structure (without downloading file contents)
+    const branch = repoData.default_branch || "main";
+    const treeRes = await fetch(
+      `${GITHUB_API_BASE}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
+      { headers },
+    );
     const treeData = await treeRes.json();
 
-    if (!treeData.tree) {
-      return NextResponse.json({ error: "No file tree found" }, { status: 404 });
+    let fileStructure: Array<{
+      path: string;
+      filename: string;
+      size: number;
+      url: string;
+    }> = [];
+
+    if (treeData.tree) {
+      // Only return file paths and metadata, not contents
+      fileStructure = treeData.tree
+        .filter((item: { type: string }) => item.type === "blob")
+        .slice(0, 100) // Limit to first 100 files for performance
+        .map((file: { path: string; size: number; url: string }) => ({
+          path: file.path,
+          filename: file.path.split("/").pop() || "",
+          size: file.size,
+          url: file.url,
+          // Don't fetch content here - do it on-demand when needed
+        }));
     }
 
-    const files = [];
-
-    // Fetch file directories and contents
-    for (const file of treeData.tree) {
-      if (file.type === "blob" && !file.path.includes("package.json")) {
-        const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`;
-        try {
-          const contentRes = await fetch(rawUrl);
-          const content = await contentRes.text();
-
-          files.push({
-            path: file.path,
-            filename: file.path.split("/").pop(),
-            content,
-          });
-        } catch (error) {
-          console.warn(`Could not fetch file content for ${file.path}`);
-        }
-      }
-    }
-
-
-    return NextResponse.json({ data: results, files: files });
-  } catch (error: any) {
+    return NextResponse.json({
+      data: results,
+      repository: {
+        name: repoData.name,
+        fullName: repoData.full_name,
+        description: repoData.description,
+        defaultBranch: branch,
+        language: repoData.language,
+        stargazersCount: repoData.stargazers_count,
+        forksCount: repoData.forks_count,
+      },
+      fileStructure,
+    });
+  } catch (error) {
     console.error("GitHub sync error:", error);
     return NextResponse.json(
       { error: "Failed to fetch from GitHub" },
