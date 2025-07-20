@@ -233,7 +233,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
               {organizations.slice(0, 3).map((org) => (
                 <div
                   key={org.id}
-                  className="bg-background/50 border-border/30 rounded-lg border p-3"
+                  className="bg-background/50 border-border rounded-lg border p-3"
                 >
                   <h4 className="text-foreground font-medium">{org.name}</h4>
                   <p className="text-muted-foreground text-sm">{org.role}</p>

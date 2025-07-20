@@ -39,26 +39,44 @@ const OrganizationCard = ({
     }
   };
 
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "owner":
+        return "👑";
+      case "manager":
+        return "⭐";
+      default:
+        return "👤";
+    }
+  };
+
   const IconComponent = getIconComponent(organization.icon);
 
   return (
     <Card className="border-border group hover:border-primary/50 flex h-full cursor-pointer flex-col p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
       {/* Mobile Layout */}
-      <div className="block flex flex-1 flex-col sm:hidden">
+      <div className="flex flex-1 flex-col sm:hidden">
         <div className="mb-3 flex items-start justify-between">
           <div className="flex min-w-0 flex-1 items-center space-x-3">
-            <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg">
-              {organization.imageUrl ? (
-                <Image
-                  src={organization.imageUrl}
-                  alt={organization.name}
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-lg object-cover"
-                />
-              ) : (
-                <IconComponent className="text-primary h-4 w-4" />
-              )}
+            <div className="relative">
+              <div className="bg-primary/10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg">
+                {organization.imageUrl ? (
+                  <Image
+                    src={organization.imageUrl}
+                    alt={organization.name}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <IconComponent className="text-primary h-4 w-4" />
+                )}
+              </div>
+              <div className="bg-background border-border absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full border shadow-sm">
+                <span className="text-xs">
+                  {getRoleIcon(organization.role)}
+                </span>
+              </div>
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="text-foreground group-hover:text-primary truncate font-serif text-sm font-semibold transition-colors">
@@ -69,7 +87,7 @@ const OrganizationCard = ({
                   organization.role,
                 )}`}
               >
-                {organization.role}
+                {organization.role.toUpperCase()}
               </span>
             </div>
           </div>
@@ -125,21 +143,28 @@ const OrganizationCard = ({
       </div>
 
       {/* Desktop Layout */}
-      <div className="flex hidden flex-1 flex-col sm:block">
+      <div className="flex flex-1 flex-col max-sm:hidden">
         <div className="flex items-start justify-between">
           <div className="flex min-w-0 flex-1 items-center space-x-4">
-            <div className="bg-primary/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
-              {organization.imageUrl ? (
-                <Image
-                  src={organization.imageUrl}
-                  alt={organization.name}
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 rounded-lg object-cover"
-                />
-              ) : (
-                <IconComponent className="text-primary h-6 w-6" />
-              )}
+            <div className="relative">
+              <div className="bg-primary/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
+                {organization.imageUrl ? (
+                  <Image
+                    src={organization.imageUrl}
+                    alt={organization.name}
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 rounded-lg object-cover"
+                  />
+                ) : (
+                  <IconComponent className="text-primary h-6 w-6" />
+                )}
+              </div>
+              <div className="bg-background border-border absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full border shadow-sm">
+                <span className="text-xs">
+                  {getRoleIcon(organization.role)}
+                </span>
+              </div>
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="text-foreground group-hover:text-primary font-serif text-lg font-semibold transition-colors">
@@ -169,7 +194,7 @@ const OrganizationCard = ({
                 organization.role,
               )}`}
             >
-              {organization.role}
+              {organization.role.toUpperCase()}
             </span>
             <Button
               variant="ghost"

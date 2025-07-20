@@ -5,7 +5,7 @@ import {
   organizationMembersTable,
   usersTable,
 } from "@/server/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 export type OrganizationWithRole = {
   id: number;
@@ -35,7 +35,8 @@ export async function getUserOrganizations(userId: number) {
       organizationMembersTable,
       eq(organizationsTable.id, organizationMembersTable.organizationId),
     )
-    .where(eq(organizationMembersTable.userId, userId));
+    .where(eq(organizationMembersTable.userId, userId))
+    .orderBy(desc(organizationsTable.createdAt));
 
   return organizations;
 }
