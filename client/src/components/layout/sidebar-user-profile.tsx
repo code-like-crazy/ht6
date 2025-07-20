@@ -145,7 +145,7 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
       {user ? (
         <Popover>
           <PopoverTrigger asChild>
-            <button className="hover:bg-sidebar-accent/30 flex w-full items-center space-x-3 rounded-xl p-2 transition-colors">
+            <button className="hover:bg-sidebar-accent/30 flex w-full items-center space-x-3 rounded-xl p-2 text-left transition-colors">
               {userAvatar}
               <div
                 className={`min-w-0 flex-1 overflow-hidden transition-all duration-300 ${

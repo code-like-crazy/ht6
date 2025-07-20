@@ -36,15 +36,37 @@ export async function syncUserToDatabase(userData: UserData) {
     .limit(1);
 
   if (existingUserByAuth0Id.length > 0) {
-    // User exists by auth0Id, update their information
+    const existingUser = existingUserByAuth0Id[0];
+
+    // Prepare update data - only update name if it's empty in DB or if Auth0 has a meaningful name
+    const updateData: {
+      name?: string;
+      email: string;
+      imageUrl: string | null;
+      updatedAt: Date;
+    } = {
+      email: userData.email || existingUser.email,
+      imageUrl: userData.picture || existingUser.imageUrl,
+      updatedAt: new Date(),
+    };
+
+    // Only update name if:
+    // 1. The existing user has no name (empty or null), OR
+    // 2. The Auth0 name is different and not empty/default
+    if (!existingUser.name || existingUser.name.trim() === "") {
+      // User has no name in DB, use Auth0 name if available
+      if (userData.name && userData.name.trim() !== "") {
+        updateData.name = userData.name;
+      }
+    } else {
+      // User has a name in DB, keep it unless Auth0 has a significantly different name
+      // This preserves user-customized names
+      updateData.name = existingUser.name;
+    }
+
     const [updatedUser] = await db
       .update(usersTable)
-      .set({
-        name: userData.name || "",
-        email: userData.email || "",
-        imageUrl: userData.picture || null,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(usersTable.auth0Id, userData.sub))
       .returning();
 
@@ -59,13 +81,21 @@ export async function syncUserToDatabase(userData: UserData) {
     .limit(1);
 
   if (existingUserByEmail.length > 0) {
+    const existingUser = existingUserByEmail[0];
+
     // User exists by email but different auth0Id, update the auth0Id
+    // Preserve existing name unless it's empty
+    const nameToUse =
+      existingUser.name && existingUser.name.trim() !== ""
+        ? existingUser.name
+        : userData.name || "";
+
     const [updatedUser] = await db
       .update(usersTable)
       .set({
         auth0Id: userData.sub,
-        name: userData.name || "",
-        imageUrl: userData.picture || null,
+        name: nameToUse,
+        imageUrl: userData.picture || existingUser.imageUrl,
         updatedAt: new Date(),
       })
       .where(eq(usersTable.email, userData.email || ""))
