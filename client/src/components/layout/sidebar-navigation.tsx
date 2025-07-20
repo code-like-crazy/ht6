@@ -25,7 +25,10 @@ const SidebarNavigation = ({ isCollapsed }: SidebarNavigationProps) => {
       <div className="space-y-1">
         {navLinks.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive =
+            item.href === "/dashboard"
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
 
           const linkContent = (
             <Link

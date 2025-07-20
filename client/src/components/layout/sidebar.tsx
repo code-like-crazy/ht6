@@ -32,14 +32,12 @@ const Sidebar = () => {
 
         {/* Theme Toggle */}
         <div
-          className={`px-4 pb-4 ${isCollapsed ? "flex justify-center" : "ml-auto"}`}
+          className={`px-4 pb-4 ${isCollapsed ? "flex justify-center" : ""}`}
         >
           {isCollapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div>
-                  <ThemeToggle />
-                </div>
+                <ThemeToggle />
               </TooltipTrigger>
               <TooltipContent side="right">Toggle theme</TooltipContent>
             </Tooltip>

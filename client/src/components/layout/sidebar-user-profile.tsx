@@ -19,7 +19,7 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
     <Image
       src={user.imageUrl}
       alt={user.name || "User"}
-      className="ring-sidebar-border rounded-full object-cover ring-2"
+      className="ring-sidebar-border shrink-0 rounded-full object-cover ring-2"
       width={40}
       height={40}
     />
