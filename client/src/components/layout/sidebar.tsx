@@ -4,14 +4,6 @@ import SidebarLogo from "./sidebar-logo";
 import SidebarNavigation from "./sidebar-navigation";
 import SidebarQuickActions from "./sidebar-quick-actions";
 import SidebarUserProfile from "./sidebar-user-profile";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { PanelLeftOpen } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useSidebar } from "@/components/providers/sidebar-provider";
 
 const Sidebar = () => {
@@ -30,24 +22,8 @@ const Sidebar = () => {
       <div className="flex flex-1 flex-col">
         <SidebarNavigation isCollapsed={isCollapsed} />
 
-        {/* Theme Toggle */}
-        <div
-          className={`px-4 pb-4 ${isCollapsed ? "flex justify-center" : ""}`}
-        >
-          {isCollapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ThemeToggle />
-              </TooltipTrigger>
-              <TooltipContent side="right">Toggle theme</TooltipContent>
-            </Tooltip>
-          ) : (
-            <ThemeToggle />
-          )}
-        </div>
-
         {/* Quick Actions Section */}
-        <SidebarQuickActions isCollapsed={isCollapsed} />
+        <SidebarQuickActions isCollapsed={isCollapsed} showThemeToggle={true} />
 
         {/* User Profile Section */}
         <SidebarUserProfile isCollapsed={isCollapsed} />
