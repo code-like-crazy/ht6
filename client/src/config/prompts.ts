@@ -60,11 +60,32 @@ The following information has been gathered from various sources in the project 
 /**
  * Builds the complete prompt for the AI assistant
  */
-export function buildPrompt(question: string, context: string): string {
+export function buildPrompt(
+  question: string,
+  context: string,
+  conversationHistory?: { content: string; sender: string }[],
+): string {
   const { systemPrompt, instructions, responseFormat, contextTemplate } =
     LOOMINAL_PROMPTS;
 
   const formattedContext = contextTemplate.replace("{context}", context);
+
+  // Format conversation history if provided
+  let conversationSection = "";
+  if (conversationHistory && conversationHistory.length > 1) {
+    const recentHistory = conversationHistory.slice(-6); // Last 6 messages for context
+    conversationSection = `
+## Recent Conversation
+${recentHistory
+  .map(
+    (msg) =>
+      `**${msg.sender === "user" ? "User" : "Assistant"}**: ${msg.content}`,
+  )
+  .join("\n\n")}
+
+---
+`;
+  }
 
   return `${systemPrompt}
 
@@ -74,12 +95,12 @@ ${instructions.map((instruction) => `- ${instruction}`).join("\n")}
 ## Response Format
 ${responseFormat}
 
-${formattedContext}
+${conversationSection}${formattedContext}
 
-## User Question
+## Current User Question
 ${question}
 
-Please provide a comprehensive answer based on the available context, formatted in Markdown.`;
+Please provide a comprehensive answer based on the available context and conversation history, formatted in Markdown.`;
 }
 
 /**

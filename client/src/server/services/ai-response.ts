@@ -38,6 +38,7 @@ interface AIResponse {
 export async function generateAIResponse(
   question: string,
   chunks: EmbeddingChunk[],
+  conversationHistory?: { content: string; sender: string }[],
 ): Promise<AIResponse> {
   try {
     // Format context using the new context formatters
@@ -46,8 +47,8 @@ export async function generateAIResponse(
     );
     const context = ContextFormatters.combineChunks(formattedChunks);
 
-    // Build the complete prompt
-    const prompt = buildPrompt(question, context);
+    // Build the complete prompt with conversation history
+    const prompt = buildPrompt(question, context, conversationHistory);
 
     // Initialize Google AI
     const ai = new GoogleGenAI({

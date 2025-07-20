@@ -97,10 +97,11 @@ export default function ProjectChatInterface({
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, newUserMessage]);
+    const updatedMessages = [...messages, newUserMessage];
+    setMessages(updatedMessages);
 
     try {
-      // Call the chat API
+      // Call the chat API with conversation history
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -109,6 +110,7 @@ export default function ProjectChatInterface({
         body: JSON.stringify({
           projectId: project.id,
           message: userMessage,
+          conversationHistory: updatedMessages.slice(-10), // Send last 10 messages for context
         }),
       });
 

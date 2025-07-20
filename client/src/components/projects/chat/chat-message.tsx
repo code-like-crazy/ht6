@@ -211,73 +211,75 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </ReactMarkdown>
         </div>
 
-        {message.sources && message.sources.length > 0 && (
-          <div className="mt-6">
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="sources" className="border-none">
-                <AccordionTrigger className="px-0 py-3 hover:no-underline">
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileText className="h-4 w-4" />
-                    <span className="font-medium">
-                      {message.sources.length} Source
-                      {message.sources.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pb-0">
-                  <div className="space-y-3 pt-2">
-                    {message.sources.map((source, index) => {
-                      const githubUrl = generateGitHubUrl(source);
-                      const sourceTitle = formatSourceTitle(source);
+        {message.sources &&
+          message.sources.length > 0 &&
+          message.sender === "assistant" && (
+            <div className="mt-6">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="sources" className="border-none">
+                  <AccordionTrigger className="px-0 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2 text-sm">
+                      <FileText className="h-4 w-4" />
+                      <span className="font-medium">
+                        {message.sources.length} Source
+                        {message.sources.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-0">
+                    <div className="space-y-3 pt-2">
+                      {message.sources.map((source, index) => {
+                        const githubUrl = generateGitHubUrl(source);
+                        const sourceTitle = formatSourceTitle(source);
 
-                      return (
-                        <motion.div
-                          key={source.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="group"
-                        >
-                          <Card className="border-border/50 bg-background/30 hover:bg-background/50 transition-all duration-200">
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-start gap-3">
-                                  <div className="text-muted-foreground mt-0.5 text-lg">
-                                    {getSourceIcon(source.sourceType)}
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="mb-2 flex items-center gap-2">
-                                      <span className="text-foreground text-sm font-medium">
-                                        {sourceTitle}
-                                      </span>
-                                      {githubUrl && (
-                                        <a
-                                          href={githubUrl}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-primary/70 hover:text-primary flex items-center gap-1 transition-colors"
-                                        >
-                                          <ExternalLink className="h-3 w-3" />
-                                        </a>
-                                      )}
+                        return (
+                          <motion.div
+                            key={source.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="group"
+                          >
+                            <Card className="border-border/50 bg-background/30 hover:bg-background/50 transition-all duration-200">
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-start gap-3">
+                                    <div className="text-muted-foreground mt-0.5 text-lg">
+                                      {getSourceIcon(source.sourceType)}
                                     </div>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                      {source.snippet}
-                                    </p>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="mb-2 flex items-center gap-2">
+                                        <span className="text-foreground text-sm font-medium">
+                                          {sourceTitle}
+                                        </span>
+                                        {githubUrl && (
+                                          <a
+                                            href={githubUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary/70 hover:text-primary flex items-center gap-1 transition-colors"
+                                          >
+                                            <ExternalLink className="h-3 w-3" />
+                                          </a>
+                                        )}
+                                      </div>
+                                      <p className="text-muted-foreground text-sm leading-relaxed">
+                                        {source.snippet}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        )}
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
 
         {message.metadata && (
           <div className="text-muted-foreground mt-3 flex items-center gap-2 text-xs">
