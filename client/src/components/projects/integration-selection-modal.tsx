@@ -74,25 +74,39 @@ export default function IntegrationSelectionModal({
     }
   };
 
-  const getCategoryColor = (categoryId: IntegrationCategory) => {
+  const getCategoryBadgeClass = (categoryId: IntegrationCategory) => {
     const category = integrationCategories.find((cat) => cat.id === categoryId);
-    return category?.color || "gray";
+    const color = category?.color || "gray";
+
+    // Return solid background classes with good contrast
+    switch (color) {
+      case "blue":
+        return "bg-blue-600 text-white";
+      case "green":
+        return "bg-green-600 text-white";
+      case "purple":
+        return "bg-purple-600 text-white";
+      case "orange":
+        return "bg-orange-600 text-white";
+      default:
+        return "bg-gray-600 text-white";
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[80vh] max-w-4xl overflow-hidden">
-        <DialogHeader>
-          <DialogTitle>Connect Integration</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-full overflow-hidden sm:max-w-4xl">
+        <DialogHeader className="pb-6">
+          <DialogTitle className="text-xl">Connect Integration</DialogTitle>
+          <DialogDescription className="text-base">
             Choose an integration to connect to your project. This will allow
             Loominal to access and analyze data from these tools.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col space-y-6">
+        <div className="flex flex-col space-y-8">
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               size="sm"
@@ -115,35 +129,28 @@ export default function IntegrationSelectionModal({
           </div>
 
           {/* Integrations Grid */}
-          <div className="grid max-h-96 grid-cols-1 gap-4 overflow-y-auto">
+          <div className="grid max-h-[50vh] grid-cols-1 gap-6 overflow-y-auto pr-2">
             {filteredIntegrations.map((integration) => {
               const isConnecting = connectingIntegration === integration.id;
 
               return (
                 <div
                   key={integration.id}
-                  className="border-border/60 bg-background/50 hover:bg-background/70 rounded-xl border p-4 transition-all hover:shadow-sm"
+                  className="border-border/60 bg-background/50 hover:bg-background/70 rounded-xl border p-6 transition-all hover:shadow-md"
                 >
-                  <div className="mb-3 flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-lg">
-                        <integration.icon className="h-5 w-5" />
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-lg">
+                        <integration.icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="text-foreground text-sm font-semibold">
+                        <h3 className="text-foreground text-base font-semibold">
                           {integration.name}
                         </h3>
                         <Badge
-                          variant="secondary"
-                          className={`mt-1 text-xs bg-${getCategoryColor(
+                          className={`mt-2 border-0 text-xs ${getCategoryBadgeClass(
                             integration.category,
-                          )}-100 text-${getCategoryColor(
-                            integration.category,
-                          )}-800 dark:bg-${getCategoryColor(
-                            integration.category,
-                          )}-900/20 dark:text-${getCategoryColor(
-                            integration.category,
-                          )}-400`}
+                          )}`}
                         >
                           {
                             integrationCategories.find(
@@ -155,15 +162,15 @@ export default function IntegrationSelectionModal({
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground mb-3 text-xs">
+                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                     {integration.description}
                   </p>
 
-                  <div className="mb-4">
-                    <p className="text-muted-foreground mb-2 text-xs">
+                  <div className="mb-6">
+                    <p className="text-muted-foreground mb-3 text-sm font-medium">
                       Features:
                     </p>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2">
                       {integration.features.slice(0, 3).map((feature) => (
                         <Badge
                           key={feature}
@@ -182,14 +189,14 @@ export default function IntegrationSelectionModal({
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                      <ExternalLink className="h-3 w-3" />
+                    <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                      <ExternalLink className="h-4 w-4" />
                       {integration.authType === "oauth" ? "OAuth" : "API Key"}
                     </div>
                     <Button
-                      size="sm"
                       onClick={() => handleConnect(integration)}
                       disabled={isConnecting}
+                      className="px-6"
                     >
                       {isConnecting ? (
                         <>
@@ -207,8 +214,8 @@ export default function IntegrationSelectionModal({
           </div>
 
           {filteredIntegrations.length === 0 && (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground text-sm">
+            <div className="py-12 text-center">
+              <p className="text-muted-foreground text-base">
                 No integrations found for the selected category.
               </p>
             </div>
