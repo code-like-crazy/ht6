@@ -5,6 +5,8 @@ import {
   timestamp,
   text,
   json,
+  serial,
+  customType,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -73,6 +75,29 @@ export const connectionsTable = pgTable("connections", {
   credentials: json().notNull(), // encrypted credentials/tokens
   settings: json().default({}),
   isActive: integer().notNull().default(1), // 1 for active, 0 for inactive
+  createdAt: timestamp().notNull().defaultNow(),
+  updatedAt: timestamp().notNull().defaultNow(),
+});
+
+// pgvector support: define a custom type for the vector column
+const vector = customType<{ data: number[] }>({
+  dataType() {
+    // 1536 is the dimension for OpenAI embeddings; adjust as needed
+    return "vector(1536)";
+  },
+});
+
+// Embeddings table for chunked project context
+export const embeddingsTable = pgTable("embeddings", {
+  id: serial("id").primaryKey(),
+  projectId: integer()
+    .notNull()
+    .references(() => projectsTable.id, { onDelete: "cascade" }),
+  sourceType: varchar({ length: 50 }).notNull(), // e.g., "github", "slack"
+  sourceId: varchar({ length: 255 }).notNull(), // e.g., file path, message id
+  chunkText: text().notNull(),
+  embedding: vector("embedding").notNull(),
+  metadata: json().default({}),
   createdAt: timestamp().notNull().defaultNow(),
   updatedAt: timestamp().notNull().defaultNow(),
 });
