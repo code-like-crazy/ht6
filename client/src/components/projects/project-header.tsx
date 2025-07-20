@@ -26,15 +26,6 @@ export default function ProjectHeader({
         projectId={project.id}
         availableProjects={availableProjects}
       />
-
-      <div className="mt-4">
-        <h1 className="text-foreground text-2xl font-bold">{project.name}</h1>
-        {project.description && (
-          <p className="text-muted-foreground mt-1 text-sm">
-            {project.description}
-          </p>
-        )}
-      </div>
     </div>
   );
 }

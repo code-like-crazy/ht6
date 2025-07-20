@@ -108,7 +108,7 @@ export default function ProjectChatInterface({
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      {/* <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
             {project.name}
@@ -122,7 +122,7 @@ export default function ProjectChatInterface({
             <Sparkles className="text-primary h-5 w-5" />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Chat Messages Area */}
       <div className="flex-1 overflow-hidden">
