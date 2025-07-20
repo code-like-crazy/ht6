@@ -92,10 +92,6 @@ export default function ProjectsSection({
                     // Handle settings click
                     console.log("Settings clicked for project:", project.id);
                   }}
-                  onClick={() => {
-                    // Handle project click
-                    console.log("Project clicked:", project.id);
-                  }}
                 />
               );
             })}

@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Users, User, Mail, Calendar, UserPlus } from "lucide-react";
-import Image from "next/image";
-import { formatDistanceToNow } from "@/lib/utils";
+import { Users } from "lucide-react";
+import MemberCard from "./member-card";
+import InviteMemberCard from "./invite-member-card";
 import InviteMemberModal from "./invite-member-modal";
 
 type OrganizationMember = {
@@ -39,27 +37,6 @@ export default function TeamMembersSection({
   organizationName,
 }: TeamMembersSectionProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case "owner":
-        return "bg-primary/10 text-primary border-primary/20";
-      case "manager":
-        return "bg-accent/10 text-accent border-accent/20";
-      default:
-        return "bg-muted text-muted-foreground border-border";
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case "owner":
-        return "👑";
-      case "manager":
-        return "⭐";
-      default:
-        return "👤";
-    }
-  };
 
   return (
     <Card className="bg-card/50 border-border">
@@ -71,99 +48,15 @@ export default function TeamMembersSection({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {members.map((member) => {
-            const isCurrentUser = member.id === currentUser.id;
+          {members.map((member) => (
+            <MemberCard
+              key={member.id}
+              member={member}
+              currentUser={currentUser}
+            />
+          ))}
 
-            return (
-              <div
-                key={member.id}
-                className={`group relative overflow-hidden rounded-lg border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
-                  isCurrentUser
-                    ? "bg-primary/5 border-primary/20 shadow-sm"
-                    : "bg-background/50 border-border hover:border-primary/30"
-                }`}
-              >
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="relative">
-                    {member.imageUrl ? (
-                      <Image
-                        src={member.imageUrl}
-                        alt={member.name}
-                        width={56}
-                        height={56}
-                        className="ring-border group-hover:ring-primary/50 h-14 w-14 rounded-full object-cover ring-2 transition-all"
-                      />
-                    ) : (
-                      <div className="bg-muted ring-border group-hover:ring-primary/50 flex h-14 w-14 items-center justify-center rounded-full ring-2 transition-all">
-                        <User className="text-muted-foreground h-6 w-6" />
-                      </div>
-                    )}
-                    <div className="bg-background border-border absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full border shadow-sm">
-                      <span className="text-xs">
-                        {getRoleIcon(member.role)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="w-full space-y-2 text-center">
-                    <div>
-                      <h3 className="text-foreground truncate text-sm font-medium">
-                        {member.name}
-                        {isCurrentUser && (
-                          <span className="text-primary ml-1 text-xs font-normal">
-                            (You)
-                          </span>
-                        )}
-                      </h3>
-                      <div className="text-muted-foreground mt-1 flex items-center justify-center gap-1 text-xs">
-                        <Mail className="h-3 w-3" />
-                        <span className="truncate">{member.email}</span>
-                      </div>
-                    </div>
-
-                    <Badge
-                      className={`${getRoleBadgeColor(member.role)} px-2 py-1 text-xs`}
-                      variant="outline"
-                    >
-                      {member.role}
-                    </Badge>
-
-                    {member.joinedAt && (
-                      <div className="text-muted-foreground flex items-center justify-center gap-1 text-xs">
-                        <Calendar className="h-3 w-3" />
-                        <span>
-                          Joined{" "}
-                          {formatDistanceToNow(new Date(member.joinedAt))} ago
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Invite Member Button */}
-          <div className="group border-border/60 hover:border-primary/50 relative overflow-hidden rounded-lg border border-dashed p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-            <Button
-              variant="ghost"
-              className="h-full w-full flex-col space-y-3 p-0"
-              onClick={() => setIsInviteModalOpen(true)}
-            >
-              <div className="bg-primary/10 ring-primary/20 group-hover:ring-primary/50 flex h-14 w-14 items-center justify-center rounded-full ring-2 transition-all">
-                <UserPlus className="text-primary h-6 w-6" />
-              </div>
-
-              <div className="w-full space-y-2 text-center">
-                <h3 className="text-foreground text-sm font-medium">
-                  Invite Member
-                </h3>
-                <p className="text-muted-foreground text-xs">
-                  Add a new team member
-                </p>
-              </div>
-            </Button>
-          </div>
+          <InviteMemberCard onInvite={() => setIsInviteModalOpen(true)} />
         </div>
 
         <InviteMemberModal
