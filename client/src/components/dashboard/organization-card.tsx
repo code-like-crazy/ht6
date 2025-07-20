@@ -129,7 +129,12 @@ const OrganizationCard = ({
 
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground truncate text-xs">
-            Created {organization.createdAt.toLocaleDateString()}
+            Created{" "}
+            {new Date(organization.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
           </p>
           <Button
             onClick={() => onSelect?.(organization)}
@@ -201,7 +206,12 @@ const OrganizationCard = ({
 
         <div className="mt-4 flex items-center justify-between">
           <p className="text-muted-foreground text-xs">
-            Created {organization.createdAt.toLocaleDateString()}
+            Created{" "}
+            {new Date(organization.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
           </p>
           <Button
             onClick={() => onSelect?.(organization)}

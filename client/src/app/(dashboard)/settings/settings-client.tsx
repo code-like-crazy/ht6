@@ -81,16 +81,17 @@ const SettingsClient = ({ user }: SettingsClientProps) => {
   };
 
   return (
-    <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:h-svh">
+    <div className="flex w-full items-center justify-center p-2 sm:p-4 lg:min-h-svh">
       <div className="border-border/60 bg-background flex h-full w-full flex-col rounded-xl border-2 border-dashed p-4 sm:p-8">
         <DashboardHeader
           title="Settings"
           description="Manage your account settings, preferences, and organization memberships."
+          showCreateButton={false}
         />
 
         <div className="mt-6 space-y-6 sm:mt-8">
           {/* Profile Settings */}
-          <Card className="bg-card/50 border-border/40">
+          <Card className="bg-card/50 border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -161,7 +162,7 @@ const SettingsClient = ({ user }: SettingsClientProps) => {
           </Card>
 
           {/* Organization Settings */}
-          <Card className="bg-card/50 border-border/40">
+          <Card className="bg-card/50 border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
@@ -189,7 +190,7 @@ const SettingsClient = ({ user }: SettingsClientProps) => {
                 </Button>
               </div>
 
-              <div className="border-border/40 border-t pt-4">
+              <div className="border-border border-t pt-4">
                 <div className="bg-accent/10 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <Shield className="text-accent mt-0.5 h-5 w-5" />

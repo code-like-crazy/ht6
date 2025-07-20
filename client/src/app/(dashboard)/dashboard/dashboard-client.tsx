@@ -63,7 +63,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
       id: 4,
       action: "Integration connected",
       project: "Slack Workspace",
-      time: "2 days ago",
+      time: "1 day ago",
       user: "You",
     },
   ];
@@ -103,7 +103,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
         {/* Quick Stats */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-8 sm:grid-cols-2 lg:grid-cols-4">
           {quickStats.map((stat, index) => (
-            <Card key={index} className="bg-card/50 border-border/40">
+            <Card key={index} className="bg-card/50 border-border">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -113,7 +113,9 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
                     <p className="text-foreground text-2xl font-bold">
                       {stat.value}
                     </p>
-                    <p className="text-accent text-xs">{stat.trend}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {stat.trend}
+                    </p>
                   </div>
                   <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
                     <stat.icon className="text-primary h-6 w-6" />
@@ -126,7 +128,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
 
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Recent Activity */}
-          <Card className="bg-card/50 border-border/40 lg:col-span-2">
+          <Card className="bg-card/50 border-border lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-foreground flex items-center gap-2">
                 <Activity className="h-5 w-5" />
@@ -142,8 +144,8 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
                   key={activity.id}
                   className="flex items-start gap-3 pb-3 last:pb-0"
                 >
-                  <div className="bg-accent/10 mt-1 flex h-8 w-8 items-center justify-center rounded-full">
-                    <Clock className="text-accent h-4 w-4" />
+                  <div className="bg-muted mt-1 flex h-8 w-8 items-center justify-center rounded-full">
+                    <Clock className="text-muted-foreground h-4 w-4" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <p className="text-foreground text-sm font-medium">
@@ -159,7 +161,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
           </Card>
 
           {/* Quick Actions */}
-          <Card className="bg-card/50 border-border/40">
+          <Card className="bg-card/50 border-border">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <Zap className="h-5 w-5" />
@@ -212,7 +214,7 @@ const DashboardClient = ({ organizations }: DashboardClientProps) => {
         </div>
 
         {/* Organizations Section */}
-        <Card className="bg-card/50 border-border/40 mt-6">
+        <Card className="bg-card/50 border-border mt-6">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-foreground">
               Your Organizations
