@@ -83,7 +83,40 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ data: results });
+    const repoRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}`, { headers });
+    const repoData = await repoRes.json();
+    const branch = repoData.default_branch || "main";
+
+    const treeRes = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`, { headers });
+    const treeData = await treeRes.json();
+
+    if (!treeData.tree) {
+      return NextResponse.json({ error: "No file tree found" }, { status: 404 });
+    }
+
+    const files = [];
+
+    // Fetch file directories and contents
+    for (const file of treeData.tree) {
+      if (file.type === "blob" && !file.path.includes("package.json")) {
+        const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`;
+        try {
+          const contentRes = await fetch(rawUrl);
+          const content = await contentRes.text();
+
+          files.push({
+            path: file.path,
+            filename: file.path.split("/").pop(),
+            content,
+          });
+        } catch (error) {
+          console.warn(`Could not fetch file content for ${file.path}`);
+        }
+      }
+    }
+
+
+    return NextResponse.json({ data: results, files: files });
   } catch (error: any) {
     console.error("GitHub sync error:", error);
     return NextResponse.json({ error: "Failed to fetch from GitHub" }, { status: 500 });
