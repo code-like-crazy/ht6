@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FolderOpen, MoreHorizontal } from "lucide-react";
+import { Users, MoreHorizontal } from "lucide-react";
 import { getIconComponent } from "@/lib/utils";
 import Image from "next/image";
 
@@ -108,10 +108,10 @@ const OrganizationCard = ({
 
         <div className="text-muted-foreground mb-3 flex items-center justify-between text-xs">
           <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1">
+            {/* <div className="flex items-center space-x-1">
               <FolderOpen className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{projectCount} projects</span>
-            </div>
+            </div> */}
             <div className="flex items-center space-x-1">
               <Users className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">{memberCount} members</span>
@@ -176,10 +176,10 @@ const OrganizationCard = ({
                 </p>
               )}
               <div className="text-muted-foreground mt-2 flex items-center space-x-4 text-sm">
-                <div className="flex items-center space-x-1">
+                {/* <div className="flex items-center space-x-1">
                   <FolderOpen className="h-4 w-4" />
                   <span>{projectCount} projects</span>
-                </div>
+                </div> */}
                 <div className="flex items-center space-x-1">
                   <Users className="h-4 w-4" />
                   <span>{memberCount} members</span>

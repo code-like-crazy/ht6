@@ -89,32 +89,40 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
                   {userAvatar}
                 </button>
               </PopoverTrigger>
-              <PopoverContent side="right" className="w-48 p-2">
-                <div className="space-y-1">
-                  <div className="px-2 py-1.5 text-sm">
-                    <p className="truncate font-medium">{user.name}</p>
-                    <p className="text-muted-foreground truncate text-xs">
-                      {user.email}
-                    </p>
+              <PopoverContent side="right" className="w-80 p-0">
+                <div className="border-border/50 bg-muted/30 border-b px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    {userAvatar}
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-foreground truncate text-sm font-semibold">
+                        {user.name}
+                      </h4>
+                      <p className="text-muted-foreground truncate text-xs">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                  <div className="border-t pt-1">
+                </div>
+
+                <div className="p-2">
+                  <div className="space-y-1">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-full justify-start"
+                      className="h-9 w-full justify-start gap-3 px-3"
                       onClick={handleSettings}
                     >
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
+                      <Settings className="h-4 w-4" />
+                      <span className="text-sm">Settings</span>
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                      className="h-9 w-full justify-start gap-3 px-3 text-red-600 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
                       onClick={handleLogout}
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Logout
+                      <LogOut className="h-4 w-4" />
+                      <span className="text-sm">Sign out</span>
                     </Button>
                   </div>
                 </div>
@@ -161,32 +169,40 @@ const SidebarUserProfile = ({ isCollapsed }: SidebarUserProfileProps) => {
               </div>
             </button>
           </PopoverTrigger>
-          <PopoverContent side="top" className="w-48 p-2">
-            <div className="space-y-1">
-              <div className="px-2 py-1.5 text-sm">
-                <p className="truncate font-medium">{user.name}</p>
-                <p className="text-muted-foreground truncate text-xs">
-                  {user.email}
-                </p>
+          <PopoverContent side="top" className="w-80 p-0">
+            <div className="border-border/50 bg-muted/30 border-b px-4 py-3">
+              <div className="flex items-center gap-3">
+                {userAvatar}
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-foreground truncate text-sm font-semibold">
+                    {user.name}
+                  </h4>
+                  <p className="text-muted-foreground truncate text-xs">
+                    {user.email}
+                  </p>
+                </div>
               </div>
-              <div className="border-t pt-1">
+            </div>
+
+            <div className="p-2">
+              <div className="space-y-1">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-full justify-start"
+                  className="h-9 w-full justify-start gap-3 px-3"
                   onClick={handleSettings}
                 >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  <Settings className="h-4 w-4" />
+                  <span className="text-sm">Settings</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-full justify-start text-red-600 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
+                  className="h-9 w-full justify-start gap-3 px-3 text-red-600 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950"
                   onClick={handleLogout}
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+                  <LogOut className="h-4 w-4" />
+                  <span className="text-sm">Sign out</span>
                 </Button>
               </div>
             </div>

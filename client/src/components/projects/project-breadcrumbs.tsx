@@ -58,6 +58,7 @@ function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
 interface ProjectBreadcrumbsProps {
   organizationName: string;
   organizationId: number;
+  organizationSlug: string;
   projectName: string;
   projectId: number;
   availableProjects?: Array<{
@@ -71,6 +72,7 @@ interface ProjectBreadcrumbsProps {
 export function ProjectBreadcrumbs({
   organizationName,
   organizationId,
+  organizationSlug,
   projectName,
   projectId,
   availableProjects = [],
@@ -116,7 +118,7 @@ export function ProjectBreadcrumbs({
           },
           {
             label: organizationName,
-            href: `/organizations/${organizationId}`,
+            href: `/org/${organizationSlug}`,
             icon: Building2,
           },
           {

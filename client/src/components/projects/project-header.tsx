@@ -22,6 +22,7 @@ export default function ProjectHeader({
       <ProjectBreadcrumbs
         organizationName={project.organization.name}
         organizationId={project.organizationId}
+        organizationSlug={project.organization.slug}
         projectName={project.name}
         projectId={project.id}
         availableProjects={availableProjects}
