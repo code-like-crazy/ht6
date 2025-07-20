@@ -5,6 +5,7 @@ import OrganizationEmptyState from "@/components/dashboard/organization-empty-st
 import OrganizationsGrid from "@/components/organizations/organizations-grid";
 import { useOrganizationModals } from "@/components/providers/organization-modal-provider";
 import { Plus, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Organization = {
   id: number;
@@ -23,10 +24,10 @@ type OrganizationsClientProps = {
 
 const OrganizationsClient = ({ organizations }: OrganizationsClientProps) => {
   const { openCreateModal, openJoinModal } = useOrganizationModals();
+  const router = useRouter();
 
   const handleSelectOrganization = (organization: Organization) => {
-    // TODO: Navigate to organization dashboard
-    console.log("Selected organization:", organization);
+    router.push(`/org/${organization.slug}`);
   };
 
   return (

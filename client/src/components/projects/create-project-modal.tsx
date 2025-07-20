@@ -165,7 +165,7 @@ export default function CreateProjectModal({
                     disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select an organization" />
                       </SelectTrigger>
                     </FormControl>

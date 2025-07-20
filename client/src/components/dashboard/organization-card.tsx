@@ -68,7 +68,7 @@ const OrganizationCard = ({
   const IconComponent = getIconComponent(organization.icon);
 
   return (
-    <Card className="border-border group hover:border-primary/20 cursor-pointer p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
+    <Card className="border-border group hover:border-primary/50 cursor-pointer p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
       {/* Mobile Layout */}
       <div className="block sm:hidden">
         <div className="mb-3 flex items-start justify-between">
