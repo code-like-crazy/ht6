@@ -6,7 +6,7 @@ const SidebarLogo = () => {
           <span className="text-primary font-serif text-lg font-bold">L</span>
         </div>
         <h1 className="text-sidebar-foreground font-serif text-xl font-semibold">
-          Luminal
+          Loominal
         </h1>
       </div>
     </div>

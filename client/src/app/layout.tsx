@@ -38,10 +38,10 @@ export const metadata: Metadata = {
   ],
   authors: [
     {
-      name: "Luminal Team",
+      name: "Loominal Team",
     },
   ],
-  creator: "Luminal Team",
+  creator: "Loominal Team",
   openGraph: {
     type: "website",
     locale: "en_US",
