@@ -31,7 +31,7 @@ const OrganizationEmptyState = ({
           </p>
 
           <div className="mx-auto mb-6 grid max-w-3xl grid-cols-1 gap-3 sm:mb-8 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
-            <div className="bg-card/50 border-border/40 rounded-lg border p-4 text-center shadow-md">
+            <div className="bg-card/50 border-border rounded-lg border p-4 text-center shadow-md">
               <div className="bg-accent/10 mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg">
                 <Users className="text-accent h-5 w-5" />
               </div>
@@ -43,7 +43,7 @@ const OrganizationEmptyState = ({
               </p>
             </div>
 
-            <div className="bg-card/50 border-border/40 rounded-lg border p-4 text-center shadow-md">
+            <div className="bg-card/50 border-border rounded-lg border p-4 text-center shadow-md">
               <div className="bg-accent/10 mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg">
                 <Building2 className="text-accent h-5 w-5" />
               </div>
@@ -55,7 +55,7 @@ const OrganizationEmptyState = ({
               </p>
             </div>
 
-            <div className="bg-card/50 border-border/40 rounded-lg border p-4 text-center shadow-md">
+            <div className="bg-card/50 border-border rounded-lg border p-4 text-center shadow-md">
               <div className="bg-accent/10 mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-lg">
                 <ArrowRight className="text-accent h-5 w-5" />
               </div>
@@ -89,7 +89,7 @@ const OrganizationEmptyState = ({
             </Button>
           </div>
 
-          <div className="border-border/40 mt-8 border-t pt-6">
+          <div className="border-border mt-8 border-t pt-6">
             <p className="text-muted-foreground text-xs">
               Need help getting started?{" "}
               <a
