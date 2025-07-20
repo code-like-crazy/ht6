@@ -3,9 +3,17 @@ export interface Connection {
   type: string;
   name: string;
   settings: {
+    // GitHub settings
     repositories?: Array<{ id: number; name: string; full_name: string }>;
     sync_enabled?: boolean;
     last_sync?: string | null;
+    // Slack settings
+    channels?: number;
+    lastSync?: string;
+    selectedChannels?: string[];
+    // Generic settings
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
   };
   isActive: number;
   createdAt: string;

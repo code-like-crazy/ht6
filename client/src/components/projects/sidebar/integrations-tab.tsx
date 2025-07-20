@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useIntegrationModal } from "@/components/providers/integration-modal-provider";
 import GitHubRepositoryModal from "@/components/projects/github-repository-modal";
+import SlackChannelsModal from "@/components/projects/slack-channels-modal";
 import { useIntegrations } from "@/hooks/use-integrations";
 import { Connection } from "@/types/integrations";
 import {
@@ -34,6 +35,12 @@ export default function IntegrationsTab({
     name: string;
   } | null>(null);
 
+  const [slackChannelsModalOpen, setSlackChannelsModalOpen] = useState(false);
+  const [selectedSlackConnection, setSelectedSlackConnection] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+
   const handleAddIntegration = () => {
     if (projectId) {
       openIntegrationModal(projectId);
@@ -47,6 +54,12 @@ export default function IntegrationsTab({
         name: connection.name,
       });
       setGithubRepoModalOpen(true);
+    } else if (connection.type === "slack") {
+      setSelectedSlackConnection({
+        id: connection.id,
+        name: connection.name,
+      });
+      setSlackChannelsModalOpen(true);
     }
   };
 
@@ -82,6 +95,21 @@ export default function IntegrationsTab({
           }}
           projectId={projectId}
           connectionName={selectedGithubConnection.name}
+        />
+      )}
+
+      {/* Slack Channels Selection Modal */}
+      {selectedSlackConnection && projectId && (
+        <SlackChannelsModal
+          isOpen={slackChannelsModalOpen}
+          onClose={() => {
+            setSlackChannelsModalOpen(false);
+            setSelectedSlackConnection(null);
+            // Refresh connections after modal closes
+            fetchConnections();
+          }}
+          projectId={projectId}
+          connectionName={selectedSlackConnection.name}
         />
       )}
     </div>

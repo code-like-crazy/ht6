@@ -63,6 +63,22 @@ export default function IntegrationSelectionModal({
         } else {
           throw new Error("Failed to initiate GitHub OAuth");
         }
+      } else if (integration.id === "slack") {
+        // Start Slack OAuth flow
+        const response = await fetch(
+          `/api/integrations/slack/auth?projectId=${projectId}`,
+          {
+            method: "GET",
+          },
+        );
+
+        if (response.ok) {
+          const { authUrl } = await response.json();
+          // Redirect to Slack OAuth
+          window.location.href = authUrl;
+        } else {
+          throw new Error("Failed to initiate Slack OAuth");
+        }
       } else {
         // Handle other integrations (API key based, etc.)
         console.log(`Connecting ${integration.name}...`);

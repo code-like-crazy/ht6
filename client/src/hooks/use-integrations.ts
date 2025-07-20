@@ -68,6 +68,17 @@ export function useIntegrations({ projectId, isDemo }: UseIntegrationsProps) {
         if (syncedItems === 0) {
           status = "disconnected";
         }
+      } else if (connection.type === "slack" && connection.settings) {
+        syncedItems = connection.settings.channels || 0;
+        if (connection.settings.lastSync) {
+          lastSync = new Date(
+            connection.settings.lastSync,
+          ).toLocaleDateString();
+        }
+
+        if (syncedItems === 0) {
+          status = "disconnected";
+        }
       }
 
       return {
