@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { VellumClient } from "vellum-ai";
 import { buildFallbackResponse, ContextFormatters } from "@/config/prompts";
 
