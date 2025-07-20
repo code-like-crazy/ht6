@@ -6,6 +6,17 @@ import {
 } from "@/server/db/schema";
 import { eq, and } from "drizzle-orm";
 
+export type OrganizationWithRole = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  imageUrl: string | null;
+  icon: string | null;
+  role: string;
+  createdAt: Date;
+};
+
 export async function getUserOrganizations(userId: number) {
   const organizations = await db
     .select({
