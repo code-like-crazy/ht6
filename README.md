@@ -97,7 +97,7 @@ FLASK_DEBUG=True
 
 - 🔐 **Secure Authentication** - Auth0 integration with social login
 - 🏢 **Organization Management** - Multi-tenant workspace support
-- 🔗 **Tool Integration** - Connect GitHub, Linear, Slack, Figma, Notion
+- 🔗 **Tool Integration** - Connect GitHub, Linear.app, Slack, Figma, Notion
 - 💬 **Intelligent Chat** - Natural language queries with contextual answers
 - 📚 **Source Citations** - Every answer includes clickable references
 - ⚡ **Real-time Responses** - Fast, contextual knowledge retrieval
