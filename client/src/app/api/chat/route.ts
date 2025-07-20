@@ -143,12 +143,111 @@ export async function POST(req: NextRequest) {
     // Generate embedding for the user's question
     const queryEmbedding = await generateEmbedding(message);
 
-    // Query similar embeddings from the project
-    const similarChunksRaw = await querySimilarEmbeddings({
+    // Query similar embeddings with diversity across source types
+    // First, get a larger set of similar chunks
+    const allSimilarChunksRaw = await querySimilarEmbeddings({
       projectId: parseInt(projectId),
       queryEmbedding,
-      topK: 10, // Get more chunks for better context
+      topK: 30, // Get more chunks to ensure diversity
     });
+
+    // Filter out low-quality chunks (like Slack join/leave messages)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filteredChunks = allSimilarChunksRaw.filter((chunk: any) => {
+      const chunkText = chunk.chunkText as string;
+
+      // Filter out Slack system messages
+      if (chunk.sourceType === "slack") {
+        const lowQualityPatterns = [
+          /has joined the channel/i,
+          /has left the channel/i,
+          /set the channel topic/i,
+          /pinned a message/i,
+          /unpinned a message/i,
+          /uploaded a file/i,
+          /started a call/i,
+          /ended a call/i,
+          /changed the channel name/i,
+          /archived this channel/i,
+          /unarchived this channel/i,
+          /<@U[A-Z0-9]+> has joined/i,
+          /<@U[A-Z0-9]+> has left/i,
+        ];
+
+        // Check if the chunk text matches any low-quality patterns
+        if (lowQualityPatterns.some((pattern) => pattern.test(chunkText))) {
+          return false;
+        }
+
+        // Filter out very short messages (likely not useful)
+        if (chunkText.trim().length < 20) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    // Group chunks by source type and select diverse sources
+    const chunksBySourceType = filteredChunks.reduce(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (acc, chunk: any) => {
+        const sourceType = chunk.sourceType as string;
+        if (!acc[sourceType]) {
+          acc[sourceType] = [];
+        }
+        acc[sourceType].push(chunk);
+        return acc;
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      {} as Record<string, any[]>,
+    );
+
+    // Select top chunks from each source type to ensure diversity
+    const similarChunksRaw: typeof allSimilarChunksRaw = [];
+    const maxPerSourceType = 4; // Max chunks per source type
+    const sourceTypes = Object.keys(chunksBySourceType);
+
+    // Prioritize getting at least one chunk from each source type
+    sourceTypes.forEach((sourceType) => {
+      const chunks = chunksBySourceType[
+        sourceType
+      ] as typeof allSimilarChunksRaw;
+      const chunksToAdd = Math.min(chunks.length, maxPerSourceType);
+      similarChunksRaw.push(...chunks.slice(0, chunksToAdd));
+    });
+
+    // If we have fewer than 10 chunks, fill up with the best remaining ones
+    if (similarChunksRaw.length < 10) {
+      const usedChunkIds = new Set(similarChunksRaw.map((chunk) => chunk.id));
+      const remainingChunks = allSimilarChunksRaw.filter(
+        (chunk) => !usedChunkIds.has(chunk.id),
+      );
+      const additionalChunks = remainingChunks.slice(
+        0,
+        10 - similarChunksRaw.length,
+      );
+      similarChunksRaw.push(...additionalChunks);
+    }
+
+    // Sort by distance to maintain relevance order
+    similarChunksRaw.sort(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (a: any, b: any) => (a.distance as number) - (b.distance as number),
+    );
+
+    // Log source type distribution for debugging
+    console.log("Source types found:", Object.keys(chunksBySourceType));
+    console.log(
+      "Chunks per source type:",
+      Object.fromEntries(
+        Object.entries(chunksBySourceType).map(([type, chunks]) => [
+          type,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (chunks as any[]).length,
+        ]),
+      ),
+    );
 
     // Type the chunks properly
     const similarChunks: EmbeddingChunk[] = similarChunksRaw.map(
@@ -206,6 +305,14 @@ export async function POST(req: NextRequest) {
         projectName: project.name,
         chunksFound: similarChunks.length,
         connectionsAvailable: connections.map((c) => c.type),
+        sourceTypesFound: Object.keys(chunksBySourceType),
+        sourceTypeDistribution: Object.fromEntries(
+          Object.entries(chunksBySourceType).map(([type, chunks]) => [
+            type,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (chunks as any[]).length,
+          ]),
+        ),
         timestamp: new Date().toISOString(),
       },
     });
