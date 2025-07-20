@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/server/services/user";
-import { getProjectById } from "@/server/services/project";
+import { getProjectById, getProjectsByUser } from "@/server/services/project";
 import { redirect, notFound } from "next/navigation";
 import ProjectDetailClient from "./project-detail-client";
 
@@ -22,13 +22,32 @@ const ProjectDetailPage = async ({ params }: ProjectDetailPageProps) => {
     notFound();
   }
 
-  const project = await getProjectById(projectId, user.id);
+  const [project, allUserProjects] = await Promise.all([
+    getProjectById(projectId, user.id),
+    getProjectsByUser(user.id),
+  ]);
 
   if (!project) {
     notFound();
   }
 
-  return <ProjectDetailClient project={project} user={user} />;
+  // Transform projects for the breadcrumbs component
+  const availableProjects = allUserProjects
+    .filter((p) => p.id !== project.id)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      organizationId: p.organizationId,
+      organizationName: p.organization.name,
+    }));
+
+  return (
+    <ProjectDetailClient
+      project={project}
+      user={user}
+      availableProjects={availableProjects}
+    />
+  );
 };
 
 export default ProjectDetailPage;

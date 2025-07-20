@@ -21,7 +21,7 @@ const SidebarNavigation = () => {
               className={`group flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? "bg-primary/10 text-primary border-primary/20 border shadow-sm"
-                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 hover:border-sidebar-border border border-transparent"
+                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
               }`}
             >
               <Icon

@@ -1,6 +1,6 @@
 "use client";
 
-import { ProjectBreadcrumbs } from "@/components/shared/breadcrumbs";
+import { ProjectBreadcrumbs } from "./project-breadcrumbs";
 import { ProjectWithOrganization } from "@/server/services/project";
 
 interface ProjectHeaderProps {

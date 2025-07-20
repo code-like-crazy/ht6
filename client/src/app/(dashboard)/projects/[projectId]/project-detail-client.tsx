@@ -15,28 +15,19 @@ interface User {
 interface ProjectDetailClientProps {
   project: ProjectWithOrganization;
   user: User;
+  availableProjects?: Array<{
+    id: number;
+    name: string;
+    organizationId: number;
+    organizationName: string;
+  }>;
 }
 
 export default function ProjectDetailClient({
   project,
   user,
+  availableProjects = [],
 }: ProjectDetailClientProps) {
-  // Mock available projects - in real app this would come from API
-  const availableProjects = [
-    {
-      id: 1,
-      name: "Marketing Website",
-      organizationId: project.organizationId,
-      organizationName: project.organization.name,
-    },
-    {
-      id: 2,
-      name: "Mobile App",
-      organizationId: project.organizationId,
-      organizationName: project.organization.name,
-    },
-  ].filter((p) => p.id !== project.id);
-
   return (
     <div className="flex h-full w-full gap-4 p-2 sm:p-4 lg:min-h-svh">
       {/* Main Chat Interface */}
