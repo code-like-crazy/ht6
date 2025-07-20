@@ -119,7 +119,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch messages from each selected channel
-    let totalMessages = 0;
     const allChunks: ChunkInput[] = [];
     for (const channelId of selectedChannelsForSync) {
       try {
@@ -129,7 +128,6 @@ export async function POST(req: NextRequest) {
           limit: 100,
         });
         const channelMessages = history.messages || [];
-        totalMessages += channelMessages.length;
 
         for (const msg of channelMessages) {
           if (!msg.text || typeof msg.text !== "string") continue;
@@ -275,7 +273,7 @@ export async function GET(req: NextRequest) {
               num_members: channel.num_members,
               purpose: channel.purpose,
             };
-          } catch (error) {
+          } catch {
             // If we can't check membership, assume we're not a member
             return {
               id: channel.id,

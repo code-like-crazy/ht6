@@ -1,13 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  MessageSquare,
-  Send,
-  Settings,
-  Link,
-  Zap,
-  BookOpen,
-} from "lucide-react";
+import { Link, Zap, BookOpen } from "lucide-react";
 
 export default function ProjectDetailLoading() {
   return (

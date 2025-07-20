@@ -138,7 +138,6 @@ async function getRepositoryFiles(
         if (item.type !== "blob") return false;
         if (item.size > 100000) return false; // Skip files larger than 100KB
 
-        const extension = item.path.toLowerCase().split(".").pop();
         const filename = item.path.toLowerCase().split("/").pop();
 
         return (

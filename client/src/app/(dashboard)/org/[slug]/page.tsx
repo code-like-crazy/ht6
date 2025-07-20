@@ -9,21 +9,22 @@ import { redirect, notFound } from "next/navigation";
 import OrganizationDetailClient from "./organization-detail-client";
 
 interface OrganizationDetailPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 const OrganizationDetailPage = async ({
   params,
 }: OrganizationDetailPageProps) => {
+  const { slug } = await params;
   const user = await getCurrentUser();
 
   if (!user || !user.id) {
     redirect("/login");
   }
 
-  const organization = await getOrganizationBySlug(params.slug, user.id);
+  const organization = await getOrganizationBySlug(slug, user.id);
 
   if (!organization) {
     notFound();
