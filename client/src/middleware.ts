@@ -19,6 +19,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // PRODUCTION RESTRICTION: Only allow landing page and not-found page
+  if (process.env.NODE_ENV === "production") {
+    const pathname = request.nextUrl.pathname;
+
+    // Allow only the landing page (/) and not-found page
+    if (pathname !== "/" && pathname !== "/not-found") {
+      // Redirect to not-found page for all other routes
+      return NextResponse.redirect(new URL("/not-found", request.url));
+    }
+  }
+
   // Check if we have a custom session cookie
   const customSession = request.cookies.get("appSession");
 
